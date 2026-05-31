@@ -8,13 +8,13 @@ import (
 )
 
 type UserModel struct {
-    ID             string `gorm:"primaryKey"`
-    FirstName      string
-    MiddleName     string
-    LastName       string
-    Email          string
-    HashedPassword string
-    IsVerified     bool
+	ID             string `gorm:"primaryKey"`
+	FirstName      string
+	MiddleName     string
+	LastName       string
+	Email          string
+	HashedPassword string
+	IsVerified     bool
 }
 
 type UserRepository struct {
@@ -35,7 +35,23 @@ func (r *UserRepository) Create(user *user.User) error {
 
 func (r *UserRepository) GetByID(id string) (*user.User, error) {
 	var model UserModel
-	if err := r.db.First(&model, id).Error; err != nil {
+	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return toUserDomain(&model), nil
+}
+
+func (r *UserRepository) FindByHumanName(humanName shared.HumanName) (*user.User, error) {
+	var model UserModel
+	if err := r.db.Where("first_name = ? AND middle_name = ? AND last_name = ?", humanName.FirstName, humanName.MiddleName, humanName.LastName).First(&model).Error; err != nil {
+		return nil, err
+	}
+	return toUserDomain(&model), nil
+}
+
+func (r *UserRepository) FindByEmail(email string) (*user.User, error) {
+	var model UserModel
+	if err := r.db.Where("email = ?", email).First(&model).Error; err != nil {
 		return nil, err
 	}
 	return toUserDomain(&model), nil
@@ -64,7 +80,11 @@ func (r *UserRepository) LogOut(userID string) error {
 }
 
 func (r *UserRepository) Register(humanName shared.HumanName, email string, hashedPassword string) (*user.User, error) {
-	newUser := user.NewUser(humanName, email, hashedPassword)
+	newUser, err := user.NewUser(humanName, email, hashedPassword)
+	if err != nil {
+		return nil, err
+	}
+
 	if err := r.Create(&newUser); err != nil {
 		return nil, err
 	}
@@ -84,24 +104,24 @@ func toUserDomain(userModel *UserModel) *user.User {
 	return &user.User{
 		ID: userModel.ID,
 		HumanName: shared.HumanName{
-			FirstName: userModel.FirstName,
+			FirstName:  userModel.FirstName,
 			MiddleName: userModel.MiddleName,
-			LastName: userModel.LastName,
+			LastName:   userModel.LastName,
 		},
-		Email: userModel.Email,
+		Email:          userModel.Email,
 		HashedPassword: userModel.HashedPassword,
-		IsVerified: userModel.IsVerified,
+		IsVerified:     userModel.IsVerified,
 	}
 }
 
 func toUserModel(user *user.User) *UserModel {
 	return &UserModel{
-		ID: user.ID,
-		FirstName: user.HumanName.FirstName,
-		MiddleName: user.HumanName.MiddleName,
-		LastName: user.HumanName.LastName,
-		Email: user.Email,
+		ID:             user.ID,
+		FirstName:      user.HumanName.FirstName,
+		MiddleName:     user.HumanName.MiddleName,
+		LastName:       user.HumanName.LastName,
+		Email:          user.Email,
 		HashedPassword: user.HashedPassword,
-		IsVerified: user.IsVerified,
+		IsVerified:     user.IsVerified,
 	}
 }

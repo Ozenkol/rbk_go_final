@@ -17,7 +17,7 @@ func NewOfferFactory(productRepository product.ProductRepositoryInterface) Offer
 }
 
 func (f *OfferFactory) CreateOffer(userID, clientID, title, description string, productIDs []string) (*Offer, error) {
-	
+
 	offer := &Offer{
 		ClientID:   clientID,
 		DocumentID: "",

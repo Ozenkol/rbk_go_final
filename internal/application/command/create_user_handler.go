@@ -6,32 +6,36 @@ import (
 )
 
 type CreateUserCommand struct {
-	Name  string
-	Email string
+	FirstName string
+	LastName  string
+	MiddleName string
+	Email     string
+	Password string
 }
 
 type CreateUserHandler struct {
-	repo user.UserRepositoryInterface
+	repo    user.UserRepositoryInterface
 	factory user.UserFactoryInterface
 }
 
 func NewCreateUserHandler(repo user.UserRepositoryInterface, factory user.UserFactoryInterface) *CreateUserHandler {
 	return &CreateUserHandler{
-		repo: repo,
+		repo:    repo,
 		factory: factory,
 	}
-}	
-	
+}
 
-func (h *CreateUserHandler) Handle(cmd CreateUserCommand) error {
+func (h *CreateUserHandler) Handle(cmd CreateUserCommand) (string, error) {
 	humanName := shared.HumanName{
-		FirstName: cmd.Name,
-		LastName:  "",
+		FirstName: cmd.FirstName,
+		LastName:  cmd.LastName,
+		MiddleName: cmd.MiddleName,
 	}
-	password := "default_password"
+	password := cmd.Password
 	user, err := h.factory.CreateUser(humanName, cmd.Email, password)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return h.repo.Create(user)
+	h.repo.Create(user)
+	return user.ID, nil
 }

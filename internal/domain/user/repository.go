@@ -7,6 +7,8 @@ type UserRepositoryInterface interface {
 	GetByID(id string) (*User, error)
 	Update(user *User) error
 	Delete(id string) error
+	FindByHumanName(humanName shared.HumanName) (*User, error)
+	FindByEmail(email string) (*User, error)
 
 	LogIn(username, password string) (*User, error)
 	LogOut(userID string) error

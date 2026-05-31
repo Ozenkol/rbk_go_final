@@ -1,47 +1,94 @@
 package handlers
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
 	http_types "github.com/Ozenkol/rbk-go-final/internal/delivery/http/types"
 	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
 	deps *http_types.Dependencies
+    logs *slog.Logger
 }
 
-func NewUserHandler(deps *http_types.Dependencies) *UserHandler {
-	return &UserHandler{deps: deps}
+func NewUserHandler(deps *http_types.Dependencies, logs *slog.Logger) *UserHandler {
+	return &UserHandler{deps: deps, logs: logs}
 }
 
-// @INVALID_ANNOTATION
+// swagger:route POST /api/v1/users users createUser
+//
+// Create a new user.
+//
+// Consumes:
+// - application/json
+//
+// Produces:
+// - application/json
+//
+// responses:
+//   201: createUserResponse
+//   400: errorResponse
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var req command.CreateUserCommand
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusCreated, gin.H{"message": "User created"})
+    var req http_requests.CreateUserRequest
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    // explicit mapping — delivery layer owns this translation
+    cmd := command.CreateUserCommand{
+        FirstName:  req.FirstName,
+        MiddleName: req.MiddleName,
+        LastName:   req.LastName,
+        Email:      req.Email,
+        Password:   req.Password,
+    }
+
+    id, err := h.deps.App.Commands.CreateUser.Handle(cmd)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    user, err := h.deps.App.Queries.GetUserByID.Handle(query.FetchUserQuery{UserID: id})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusCreated, user)
+
 }
 
-// GetUser godoc
-// @Summary Get user by ID
-// @Description Fetch a user by their ID
-// @Tags users
-// @Produce json
-// @Param id path string true "User ID"
-// @Success 200 {object} user.User
-// @Failure 404 {object} map[string]string
-// @Router /api/v1/users/{id} [get]
+// swagger:route GET /api/v1/users/{id} users getUser
+//
+// Get user by ID.
+//
+// Produces:
+// - application/json
+//
+// parameters:
+//   + name: id
+//     in: path
+//     required: true
+//     type: string
+//
+// responses:
+//   200: getUserResponse
+//   404: errorResponse
 func (h *UserHandler) GetUser(c *gin.Context) {
 	q := query.FetchUserQuery{UserID: c.Param("id")}
 	user, err := h.deps.App.Queries.GetUserByID.Handle(q)
 	if err != nil {
+		h.logs.Error("User not found", slog.String("user_id", c.Param("id")))
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
+	h.logs.Info("User retrieved", slog.String("user_id", c.Param("id")))
 	c.JSON(http.StatusOK, user)
 }

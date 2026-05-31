@@ -40,7 +40,7 @@ func NewOfferRepository(db *gorm.DB) (offer.OfferRepositoryInterface, error) {
 	return &OfferRepository{db: db}, nil
 }
 
-func (r *OfferRepository) Create(offer *offer.Offer) error {	
+func (r *OfferRepository) Create(offer *offer.Offer) error {
 	offerModel := toOfferModel(offer)
 	return r.db.Create(offerModel).Error
 }
@@ -62,7 +62,7 @@ func (r *OfferRepository) Delete(id string) error {
 	return r.db.Where("id = ?", id).Delete(&OfferModel{}).Error
 }
 
-func toOfferDomain (offerModel *OfferModel) *offer.Offer {
+func toOfferDomain(offerModel *OfferModel) *offer.Offer {
 	offerItems := make([]offer.OfferItem, len(offerModel.OfferItems))
 	for i, item := range offerModel.OfferItems {
 		offerItems[i] = offer.OfferItem{
@@ -80,7 +80,7 @@ func toOfferDomain (offerModel *OfferModel) *offer.Offer {
 	}
 }
 
-func toOfferModel (offer *offer.Offer) *OfferModel {
+func toOfferModel(offer *offer.Offer) *OfferModel {
 	offerItems := make([]OfferItemModel, len(offer.OfferItems))
 	for i, item := range offer.OfferItems {
 		currency := CurrencyModel{
@@ -90,9 +90,9 @@ func toOfferModel (offer *offer.Offer) *OfferModel {
 		offerItems[i] = OfferItemModel{
 			OfferID:   offer.ID,
 			ProductID: item.ProductID,
-			Quantity: int(item.Amount),
-			Price:    item.Money.Amount,
-			Currency: currency,
+			Quantity:  int(item.Amount),
+			Price:     item.Money.Amount,
+			Currency:  currency,
 		}
 	}
 	return &OfferModel{

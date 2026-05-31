@@ -1,29 +1,47 @@
 package user
 
-import "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+import (
+	"errors"
+	"regexp"
+
+	"github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+	"github.com/google/uuid"
+)
 
 type User struct {
-	ID        string
-	HumanName shared.HumanName
-	Email    string
+	ID             string
+	HumanName      shared.HumanName
+	Email          string
 	HashedPassword string
-	IsVerified bool
+	IsVerified     bool
 }
 
-func NewUser(humanName shared.HumanName, email string, hashedPassword string) User {
+func NewUser(humanName shared.HumanName, email string, hashedPassword string) (User, error) {
 	if humanName.FirstName == "" || humanName.LastName == "" {
-		panic("FirstName and LastName cannot be empty")
+		return User{}, errors.New("FirstName and LastName cannot be empty")
 	}
 	if email == "" {
-		panic("Email cannot be empty")
+		return User{}, errors.New("Email cannot be empty")
+	}
+	if email != "" && !isValidEmail(email) {
+		return User{}, errors.New("Invalid email format")
 	}
 	if hashedPassword == "" {
-		panic("HashedPassword cannot be empty")
+		return User{}, errors.New("HashedPassword cannot be empty")
 	}
+	id := uuid.New().String() // "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
 	return User{
-		HumanName: humanName,
-		Email:    email,
+		ID:             id,
+		HumanName:      humanName,
+		Email:          email,
 		HashedPassword: hashedPassword,
-		IsVerified: false,
-	}
+		IsVerified:     false,
+	}, nil
+}
+
+func isValidEmail(email string) bool {
+	// Simple regex for email validation
+	const emailRegex = `^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`
+	matched, _ := regexp.MatchString(emailRegex, email)
+	return matched
 }

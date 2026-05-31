@@ -1,15 +1,129 @@
 {
-    "schemes": [
-        "http"
-    ],
-    "swagger": "2.0",
-    "info": {
-        "description": "Test API",
-        "title": "CRM API",
-        "contact": {},
-        "version": "1.0"
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "# CRM management API",
+    "title": "CRM API",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8081",
+  "basePath": "/",
+  "paths": {
+    "/api/v1/users": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "users"
+        ],
+        "summary": "Create a new user.",
+        "operationId": "createUser",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "first_name": {
+                  "type": "string",
+                  "x-go-name": "FirstName"
+                },
+                "last_name": {
+                  "type": "string",
+                  "x-go-name": "LastName"
+                },
+                "password": {
+                  "type": "string",
+                  "x-go-name": "Password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/createUserResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
     },
-    "host": "localhost:8081",
-    "basePath": "/",
-    "paths": {}
+    "/api/v1/users/{id}": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "users"
+        ],
+        "summary": "Get user by ID.",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getUserResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    }
+  },
+  "responses": {
+    "createUserResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "x-go-name": "Message"
+          }
+        }
+      }
+    },
+    "errorResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "x-go-name": "Error"
+          }
+        }
+      }
+    },
+    "getUserResponse": {
+      "description": ""
+    }
+  }
 }

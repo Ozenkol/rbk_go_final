@@ -11,22 +11,22 @@ import (
 	"syscall"
 	"time"
 
-	_ "github.com/Ozenkol/rbk-go-final/api" // runtime doc registration, NOT in route.go
-
+	_ "github.com/Ozenkol/rbk-go-final/api"
 	http_types "github.com/Ozenkol/rbk-go-final/internal/delivery/http/types"
 	"github.com/gin-gonic/gin"
 )
 
 type Mode string
+
 const (
 	Development Mode = "dev"
-	Production Mode = "prod"
+	Production  Mode = "prod"
 )
 
 type ServerConfig struct {
-	Host string
-	Port int
-	Mode Mode
+	Host            string
+	Port            int
+	Mode            Mode
 	ReadTimeout     time.Duration
 	WriteTimeout    time.Duration
 	IdleTimeout     time.Duration
@@ -35,16 +35,16 @@ type ServerConfig struct {
 
 type Server struct {
 	httpServer *http.Server
-	engine 		*gin.Engine
-	cfg 	  ServerConfig	
-	logger   *slog.Logger
+	engine     *gin.Engine
+	cfg        ServerConfig
+	logger     *slog.Logger
 }
 
 func DefaultConfig() ServerConfig {
 	return ServerConfig{
-		Host: "localhost",
-		Port: 8081,
-		Mode: Development,
+		Host:            "localhost",
+		Port:            8081,
+		Mode:            Development,
 		ReadTimeout:     30 * time.Second,
 		WriteTimeout:    30 * time.Second,
 		IdleTimeout:     60 * time.Second,
@@ -87,7 +87,7 @@ func (s *Server) Start(ctx context.Context) error {
 	}()
 
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit,syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	select {
 	case err := <-serverErr:

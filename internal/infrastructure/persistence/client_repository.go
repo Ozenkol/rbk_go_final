@@ -8,19 +8,19 @@ import (
 
 type ClientModel struct {
 	gorm.Model
-	ID        string `gorm:"primaryKey"`
-	FirstName string
+	ID         string `gorm:"primaryKey"`
+	FirstName  string
 	MiddleName string
-	LastName string
-	BirthDay int
+	LastName   string
+	BirthDay   int
 	BirthMonth int
-	BirthYear int
-	Country string
-	City string
-	Street string
-	Building string
-	Apartment string
-	IsActive bool
+	BirthYear  int
+	Country    string
+	City       string
+	Street     string
+	Building   string
+	Apartment  string
+	IsActive   bool
 }
 
 type ClientRepository struct {
@@ -73,20 +73,20 @@ func toClientDomain(clientModel *ClientModel) *client.Client {
 		ID: clientModel.ID,
 		Person: shared.Person{
 			Name: shared.HumanName{
-				FirstName: clientModel.FirstName,
+				FirstName:  clientModel.FirstName,
 				MiddleName: clientModel.MiddleName,
-				LastName: clientModel.LastName,
+				LastName:   clientModel.LastName,
 			},
 			BirthDate: shared.BirthDate{
-				Day: clientModel.BirthDay,
+				Day:   clientModel.BirthDay,
 				Month: clientModel.BirthMonth,
-				Year: clientModel.BirthYear,
+				Year:  clientModel.BirthYear,
 			},
 			Address: shared.Address{
-				Country: clientModel.Country,
-				City: clientModel.City,
-				Street: clientModel.Street,
-				Building: clientModel.Building,
+				Country:   clientModel.Country,
+				City:      clientModel.City,
+				Street:    clientModel.Street,
+				Building:  clientModel.Building,
 				Apartment: clientModel.Apartment,
 			},
 		},
@@ -96,18 +96,18 @@ func toClientDomain(clientModel *ClientModel) *client.Client {
 
 func toClientModel(client *client.Client) *ClientModel {
 	return &ClientModel{
-		ID:        client.ID,
-		FirstName: client.Person.Name.FirstName,
+		ID:         client.ID,
+		FirstName:  client.Person.Name.FirstName,
 		MiddleName: client.Person.Name.MiddleName,
-		LastName: client.Person.Name.LastName,
-		BirthDay: client.Person.BirthDate.Day,
+		LastName:   client.Person.Name.LastName,
+		BirthDay:   client.Person.BirthDate.Day,
 		BirthMonth: client.Person.BirthDate.Month,
-		BirthYear: client.Person.BirthDate.Year,
-		Country: client.Person.Address.Country,
-		City: client.Person.Address.City,
-		Street: client.Person.Address.Street,
-		Building: client.Person.Address.Building,
-		Apartment: client.Person.Address.Apartment,
-		IsActive: client.IsActive,
+		BirthYear:  client.Person.BirthDate.Year,
+		Country:    client.Person.Address.Country,
+		City:       client.Person.Address.City,
+		Street:     client.Person.Address.Street,
+		Building:   client.Person.Address.Building,
+		Apartment:  client.Person.Address.Apartment,
+		IsActive:   client.IsActive,
 	}
 }

@@ -60,7 +60,6 @@ func toTaskModel(task *task.Task) *TaskModel {
 	}
 }
 
-
 func toTaskDomain(model *TaskModel) *task.Task {
 	return &task.Task{
 		ID:          model.ID,
