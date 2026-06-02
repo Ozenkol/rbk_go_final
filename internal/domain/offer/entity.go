@@ -60,5 +60,8 @@ func (o *Offer) RemoveOfferItem(product product.Product) {
 }
 
 func (o *Offer) AddDocument(document document.Document) {
+	if o.DocumentID != "" {
+		return
+	}
 	o.DocumentID = document.ID
 }

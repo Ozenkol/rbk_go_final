@@ -12,7 +12,7 @@ import (
 	"time"
 
 	_ "github.com/Ozenkol/rbk-go-final/api"
-	http_types "github.com/Ozenkol/rbk-go-final/internal/delivery/http/types"
+	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
 	"github.com/gin-gonic/gin"
 )
 
@@ -52,14 +52,16 @@ func DefaultConfig() ServerConfig {
 	}
 }
 
-func NewServer(cfg ServerConfig, logger *slog.Logger, deps *http_types.Dependencies) *Server {
+func NewServer(cfg ServerConfig, logger *slog.Logger, deps http_deps.Dependencies) *Server {
 	if logger == nil {
 		logger = slog.Default()
 	}
 
 	engine := gin.New()
 
-	registerRoutes(engine, logger, *deps)
+	
+
+	registerRoutes(engine, logger, deps)
 
 	s := &Server{
 		engine: engine,

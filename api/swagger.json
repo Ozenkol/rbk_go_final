@@ -17,6 +17,84 @@
   "host": "localhost:8081",
   "basePath": "/",
   "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "users"
+        ],
+        "summary": "Authenticate an existing user.",
+        "operationId": "loginUser",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/loginUserResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "users"
+        ],
+        "summary": "Register a new user and authenticate.",
+        "operationId": "registerUser",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "x-go-name": "Email"
+                },
+                "first_name": {
+                  "type": "string",
+                  "x-go-name": "FirstName"
+                },
+                "last_name": {
+                  "type": "string",
+                  "x-go-name": "LastName"
+                },
+                "middle_name": {
+                  "type": "string",
+                  "x-go-name": "MiddleName"
+                },
+                "password": {
+                  "type": "string",
+                  "x-go-name": "Password"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/createUserResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
     "/api/v1/users": {
       "post": {
         "consumes": [
@@ -49,6 +127,10 @@
                 "last_name": {
                   "type": "string",
                   "x-go-name": "LastName"
+                },
+                "middle_name": {
+                  "type": "string",
+                  "x-go-name": "MiddleName"
                 },
                 "password": {
                   "type": "string",

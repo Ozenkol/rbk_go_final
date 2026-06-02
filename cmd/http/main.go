@@ -7,7 +7,7 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/container"
 	http_delivery "github.com/Ozenkol/rbk-go-final/internal/delivery/http"
-	http_types "github.com/Ozenkol/rbk-go-final/internal/delivery/http/types"
+	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
 )
 
 func main() {
@@ -21,12 +21,10 @@ func main() {
 		DSN: "host=localhost user=postgres password=password dbname=rbk_db port=5432 sslmode=disable", // pull from os.Getenv("DATABASE_DSN") in prod
 	})
 
-	deps := &http_types.Dependencies{
-		App: c.App(),
-	}
-
 	ctx := context.Background()
 	cfg := http_delivery.DefaultConfig()
+
+	deps := http_deps.NewDependencies(c.App())
 
 	server := http_delivery.NewServer(
 		cfg,

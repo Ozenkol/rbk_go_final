@@ -6,17 +6,17 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
+	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
 	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
-	http_types "github.com/Ozenkol/rbk-go-final/internal/delivery/http/types"
 	"github.com/gin-gonic/gin"
 )
 
 type UserHandler struct {
-	deps *http_types.Dependencies
+	deps *http_deps.Dependencies
     logs *slog.Logger
 }
 
-func NewUserHandler(deps *http_types.Dependencies, logs *slog.Logger) *UserHandler {
+func NewUserHandler(deps *http_deps.Dependencies, logs *slog.Logger) *UserHandler {
 	return &UserHandler{deps: deps, logs: logs}
 }
 
@@ -61,7 +61,15 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
         return
     }
 
-    c.JSON(http.StatusCreated, user)
+    c.JSON(http.StatusCreated, 
+        gin.H{
+            "id": user.ID,
+            "first_name": user.HumanName.FirstName,
+            "middle_name": user.HumanName.MiddleName,
+            "last_name": user.HumanName.LastName,
+            "email": user.Email,
+        },
+    )
 
 }
 

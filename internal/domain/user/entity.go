@@ -45,3 +45,8 @@ func isValidEmail(email string) bool {
 	matched, _ := regexp.MatchString(emailRegex, email)
 	return matched
 }
+
+func (u *User) CheckPassword(password string) bool {
+	return u.HashedPassword == hashPassword(password)
+}
+

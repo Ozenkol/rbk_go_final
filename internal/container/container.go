@@ -5,14 +5,17 @@ import (
 	"sync"
 
 	"github.com/Ozenkol/rbk-go-final/internal/application"
+	"github.com/Ozenkol/rbk-go-final/internal/application/adapters"
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
+	"github.com/Ozenkol/rbk-go-final/internal/application/service"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/client"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/offer"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/product"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/task"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/user"
 	"github.com/Ozenkol/rbk-go-final/internal/infrastructure/persistence"
+	"github.com/go-redis/redis/v8"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -69,6 +72,13 @@ func (c *Container) DB() *gorm.DB {
 	return c.db
 }
 
+func (c *Container) RedisDB() *redis.Client {
+	return redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "password", // Set if your Redis instance requires authentication
+		DB:       0,          // Use default DB
+	})
+}
 // --- Repositories ---
 
 func (c *Container) ClientRepository() client.ClientRepositoryInterface {
@@ -132,6 +142,14 @@ func (c *Container) TaskRepository() task.TaskRepositoryInterface {
 	return c.taskRepo
 }
 
+func (c *Container) TokenRepository() adapters.TokenRepositoryInterface {
+	repo, err := persistence.NewTokenRepository(c.RedisDB())
+	if err != nil {
+		panic(fmt.Sprintf("container: TokenRepository init failed: %v", err))
+	}
+	return repo
+}
+
 // --- Domain ---
 
 func (c *Container) OfferFactory() offer.OfferFactoryInterface {
@@ -167,6 +185,9 @@ func (c *Container) App() *application.Application {
 			Queries: application.Queries{
 				GetUserByID: query.NewFetchUserHandler(c.UserRepository()),
 			},
+			 Services: application.Services{
+				AuthService: service.NewAuthService(c.UserRepository(), c.TokenRepository()),
+			 },			
 		}
 	}
 	return c.app
