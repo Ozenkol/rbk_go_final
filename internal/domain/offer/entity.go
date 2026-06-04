@@ -21,20 +21,15 @@ func (o *Offer) TotalAmount() float64 {
 }
 
 func (o *Offer) AddOfferItem(product product.Product) {
-	o.OfferItems = append(o.OfferItems, OfferItem{
-		Description: product.Description,
-		Amount:      1,
-		ProductID:   product.ID,
-		Money:       product.Price,
-	})
-}
-
-func (o *Offer) IncrementOfferItem(product product.Product, amount int) {
-	for i, item := range o.OfferItems {
-		if item.ProductID == product.ID {
-			o.OfferItems[i].Amount += amount
-			break
-		}
+	isExistItem, foundOffer := findOfferItem(o.OfferItems, product.ID)
+	if isExistItem {
+		o.OfferItems = append(o.OfferItems, OfferItem{
+			ProductID: product.ID,
+			Amount:    1,
+			Money:     product.Price,
+		})
+	} else {
+		foundOffer.Amount++
 	}
 }
 
@@ -64,4 +59,13 @@ func (o *Offer) AddDocument(document document.Document) {
 		return
 	}
 	o.DocumentID = document.ID
+}
+
+func findOfferItem(offerItems []OfferItem, productID string) (bool, *OfferItem) {
+	for _, item := range offerItems {
+		if item.ProductID == productID {
+			return true, &item
+		}
+	}
+	return false, nil
 }

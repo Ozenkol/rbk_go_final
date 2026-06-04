@@ -6,8 +6,8 @@ import (
 )
 
 type TaskModel struct {
-	ID          string `gorm:"primaryKey"`
-	ClientID    string
+	ID          string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	UserID    string
 	Title       string
 	Description string
 	StartTime   string
@@ -26,9 +26,13 @@ func NewTaskRepository(db *gorm.DB) (task.TaskRepositoryInterface, error) {
 	return &TaskRepository{db: db}, nil
 }
 
-func (r *TaskRepository) Create(task *task.Task) error {
+func (r *TaskRepository) Create(task *task.Task) (*task.Task, error) {
 	taskModel := toTaskModel(task)
-	return r.db.Create(taskModel).Error
+	err := r.db.Create(taskModel).Error
+	if err != nil {
+		return nil, err
+	}
+	return toTaskDomain(taskModel), nil
 }
 
 func (r *TaskRepository) GetByID(id string) (*task.Task, error) {
@@ -39,9 +43,13 @@ func (r *TaskRepository) GetByID(id string) (*task.Task, error) {
 	return toTaskDomain(&model), nil
 }
 
-func (r *TaskRepository) Update(task *task.Task) error {
+func (r *TaskRepository) Update(task *task.Task) (*task.Task, error) {
 	taskModel := toTaskModel(task)
-	return r.db.Save(taskModel).Error
+	err := r.db.Save(taskModel).Error
+	if err != nil {
+		return nil, err
+	}
+	return toTaskDomain(taskModel), nil
 }
 
 func (r *TaskRepository) Delete(id string) error {
@@ -49,21 +57,24 @@ func (r *TaskRepository) Delete(id string) error {
 }
 
 func toTaskModel(task *task.Task) *TaskModel {
-	return &TaskModel{
-		ID:          task.ID,
-		ClientID:    task.ClientID,
+	taskModel := &TaskModel{
+		UserID:    task.UserID,
 		Title:       task.Title,
 		Description: task.Description,
 		StartTime:   task.StartTime,
 		EndTime:     task.EndTime,
 		IsDone:      task.IsDone,
 	}
+	if task.ID != "" {
+		taskModel.ID = task.ID
+	}
+	return taskModel
 }
 
 func toTaskDomain(model *TaskModel) *task.Task {
 	return &task.Task{
 		ID:          model.ID,
-		ClientID:    model.ClientID,
+		UserID:    model.UserID,
 		Title:       model.Title,
 		Description: model.Description,
 		StartTime:   model.StartTime,

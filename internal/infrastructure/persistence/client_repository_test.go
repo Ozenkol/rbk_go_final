@@ -63,11 +63,12 @@ func TestClientRepository_SaveFindByID(t *testing.T) {
 		},
 		IsActive: true,
 	}
-	err = repo.Save(&c1)
+	createdUser, err := repo.Save(&c1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+	println(createdUser)
+
 	found, err := repo.FindByID("1")
 	if err != nil {
 		t.Fatal(err)
@@ -110,7 +111,8 @@ func TestClientRepository_FindAll(t *testing.T) {
 		},
 		IsActive: true,
 	}
-	err = repo.Save(&c1)
+	createdUser, err := repo.Save(&c1)
+	println(createdUser)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -141,10 +143,11 @@ func TestClientRepository_FindAll(t *testing.T) {
 		},
 		IsActive: true,
 	}
-	err = repo.Save(&c2)
+	createdUser, err = repo.Save(&c2)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 
 	allClients, err := repo.FindAll()
 	if err != nil {
@@ -189,10 +192,11 @@ func TestClientRepository_UpdateDelete(t *testing.T) {
 		},
 		IsActive: true,
 	}
-	err = repo.Save(&c1)
+	createdUser, err := repo.Save(&c1)
 	if err != nil {
 		t.Fatal(err)
 	}
+	println(createdUser)
 	c1.IsActive = false
 	err = repo.Update(&c1)	
 	if err != nil {

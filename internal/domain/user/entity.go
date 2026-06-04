@@ -14,6 +14,8 @@ type User struct {
 	Email          string
 	HashedPassword string
 	IsVerified     bool
+	CreatedAt      int64
+	UpdatedAt      int64
 }
 
 func NewUser(humanName shared.HumanName, email string, hashedPassword string) (User, error) {

@@ -100,3 +100,48 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	h.logs.Info("User retrieved", slog.String("user_id", c.Param("id")))
 	c.JSON(http.StatusOK, user)
 }
+
+// swagger:response createUserResponse
+type CreateUserResponse struct {
+	// in: body
+	Body struct {
+		ID         string `json:"id"`
+		FirstName  string `json:"first_name"`
+		MiddleName string `json:"middle_name"`
+		LastName   string `json:"last_name"`
+		Email      string `json:"email"`
+	}
+}
+
+// swagger:response getUserResponse
+type GetUserResponse struct {
+	// in: body
+	Body struct {
+		ID         string `json:"id"`
+		FirstName  string `json:"first_name"`
+		MiddleName string `json:"middle_name"`
+		LastName   string `json:"last_name"`
+		Email      string `json:"email"`
+	}
+}
+
+// swagger:response errorResponse
+type ErrorResponse struct {
+	// in: body
+	Body struct {
+		Error string `json:"error"`
+	}
+}
+
+// swagger:parameters createUser
+type CreateUserRequestParams struct {
+	// in: body
+	// required: true
+	Body struct {
+		FirstName  string `json:"first_name"`
+		MiddleName string `json:"middle_name"`
+		LastName   string `json:"last_name"`
+		Email      string `json:"email"`
+		Password   string `json:"password"`
+	}
+}

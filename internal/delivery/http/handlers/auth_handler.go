@@ -109,3 +109,21 @@ func (h *AuthHandler) LoginUser(c *gin.Context) {
 	h.logs.Info("User logged in", slog.String("email", req.Email))
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
+
+// swagger:response loginUserResponse
+type LoginUserResponse struct {
+	// in: body
+	Body struct {
+		Token string `json:"token"`
+	}
+}
+
+// swagger:parameters loginUser
+type LoginUserRequestParams struct {
+	// in: body
+	// required: true
+	Body struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+}

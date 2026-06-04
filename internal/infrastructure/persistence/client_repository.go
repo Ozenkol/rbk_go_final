@@ -34,9 +34,13 @@ func NewClientRepository(db *gorm.DB) (client.ClientRepositoryInterface, error) 
 	return &ClientRepository{db: db}, nil
 }
 
-func (r *ClientRepository) Save(client *client.Client) error {
+func (r *ClientRepository) Save(client *client.Client) (*client.Client, error) {
 	clientModel := toClientModel(client)
-	return r.db.Save(clientModel).Error
+	err := r.db.Save(clientModel).Error
+	if err != nil {
+		return nil, err
+	}
+	return toClientDomain(clientModel), nil
 }
 
 func (r *ClientRepository) FindByID(id string) (*client.Client, error) {

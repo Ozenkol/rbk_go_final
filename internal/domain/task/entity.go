@@ -2,7 +2,7 @@ package task
 
 type Task struct {
 	ID          string
-	ClientID    string
+	UserID    string
 	Title       string
 	Description string
 	StartTime   string

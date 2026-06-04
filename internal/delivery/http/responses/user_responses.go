@@ -1,4 +1,4 @@
-package handlers
+package http_responses
 
 // swagger:response createUserResponse
 type createUserResponse struct {
