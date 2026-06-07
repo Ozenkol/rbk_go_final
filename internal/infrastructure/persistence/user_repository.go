@@ -1,6 +1,8 @@
 package persistence
 
 import (
+	"fmt"
+
 	"github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/user"
 	"gorm.io/gorm"
@@ -21,7 +23,7 @@ type UserRepository struct {
 
 func NewUserRepository(db *gorm.DB) user.UserRepositoryInterface {
 	if err := db.AutoMigrate(&UserModel{}); err != nil {
-		panic(err)
+		fmt.Printf("Error migrating UserModel: %v\n", err)
 	}
 	return &UserRepository{db: db}
 }
