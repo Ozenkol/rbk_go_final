@@ -6,6 +6,7 @@ type Document struct {
 	ID               string
 	UserID 		 		string
 	ClientID         string
+	CompanyID		string
 	Type             string
 	Number           string
 	IssuedBy         string

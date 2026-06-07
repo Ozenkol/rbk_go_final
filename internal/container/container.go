@@ -10,8 +10,12 @@ import (
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
 	"github.com/Ozenkol/rbk-go-final/internal/application/service"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/client"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/file"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/invoice"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/offer"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/product"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/setting"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/tag"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/task"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/user"
 	"github.com/Ozenkol/rbk-go-final/internal/infrastructure/persistence"
@@ -150,6 +154,38 @@ func (c *Container) TokenRepository() adapters.TokenRepositoryInterface {
 	return repo
 }
 
+func (c *Container) InvoiceRepository() invoice.InvoiceRepositoryInterface {
+	repo, err := persistence.NewInvoiceRepository(c.DB())
+	if err != nil {
+		panic(fmt.Sprintf("container: InvoiceRepository init failed: %v", err))
+	}
+	return repo
+}
+
+func (c *Container) FileRepository() file.FileRepositoryInterface {
+	repo, err := persistence.NewFileRepository(c.DB())
+	if err != nil {
+		panic(fmt.Sprintf("container: FileRepository init failed: %v", err))
+	}
+	return repo
+}
+
+func (c *Container) SettingRepository() setting.SettingRepositoryInterface {
+	repo, err := persistence.NewSettingRepository(c.DB())
+	if err != nil {
+		panic(fmt.Sprintf("container: SettingRepository init failed: %v", err))
+	}
+	return repo
+}
+
+func (c *Container) TagRepository() tag.TagRepositoryInterface {
+	repo, err := persistence.NewTagRepository(c.DB())
+	if err != nil {
+		panic(fmt.Sprintf("container: TagRepository init failed: %v", err))
+	}
+	return repo
+}
+
 // --- Domain ---
 
 func (c *Container) OfferFactory() offer.OfferFactoryInterface {
@@ -177,10 +213,16 @@ func (c *Container) App() *application.Application {
 	if c.app == nil {
 		c.app = &application.Application{
 			Commands: application.Commands{
+				// Clients command handler
 				CreateUser: command.NewCreateUserHandler(
 					c.UserRepository(),
 					c.UserFactory(),
 				),
+				CreateClient: command.NewCreateClientHandler(
+					c.ClientRepository(),
+				),
+
+				// Tasks command handlers
 				CreateTask: command.NewCreateTaskHandler(
 					c.TaskRepository(),
 				),
@@ -190,15 +232,17 @@ func (c *Container) App() *application.Application {
 				UpdateTask: command.NewUpdateTaskHandler(
 					c.TaskRepository(),
 				),
-				CreateClient: command.NewCreateClientHandler(
-					c.ClientRepository(),
-				),
+
 			},
 			Queries: application.Queries{
+				// Clients query handler
 				GetUserByID: query.NewFetchUserHandler(c.UserRepository()),
+
+				// Tasks query handlers
 				GetTaskByID: query.NewFetchTaskByIDHandler(c.TaskRepository()),
 			},
 			 Services: application.Services{
+				// Auth service
 				AuthService: service.NewAuthService(c.UserRepository(), c.TokenRepository()),
 			 },			
 		}

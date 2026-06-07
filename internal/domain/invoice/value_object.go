@@ -2,6 +2,7 @@ package invoice
 
 type InvoiceItem struct {
 	Description string
-	Amount      float64
+	InvoiceID   string
+	Amount      int
 	ProductID   string
 }

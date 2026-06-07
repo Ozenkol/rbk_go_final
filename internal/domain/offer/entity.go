@@ -9,6 +9,7 @@ type Offer struct {
 	ID         string
 	ClientID   string
 	DocumentID string
+	CompanyID  string
 	OfferItems []OfferItem
 }
 

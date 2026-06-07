@@ -4,6 +4,7 @@ import "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 
 type Client struct {
 	ID       string
+	CompanyID string
 	Person   shared.Person
 	IsActive bool
 }

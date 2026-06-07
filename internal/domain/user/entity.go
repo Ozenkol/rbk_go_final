@@ -12,6 +12,7 @@ type User struct {
 	ID             string
 	HumanName      shared.HumanName
 	Email          string
+	CompanyID	  string
 	HashedPassword string
 	IsVerified     bool
 	CreatedAt      int64
