@@ -10,14 +10,79 @@
   },
   "host": "localhost:8081",
   "paths": {
+    "/api/v1/analytics": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "listAnalytics"
+      },
+      "post": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "createAnalytic",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Analytic"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/analytics/{id}": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "getAnalytic",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "updateAnalytic",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "deleteAnalytic",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
     "/api/v1/auth/login": {
       "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "users"
         ],
@@ -53,7 +118,7 @@
           "200": {
             "$ref": "#/responses/loginUserResponse"
           },
-          "400": {
+          "401": {
             "$ref": "#/responses/errorResponse"
           }
         }
@@ -61,12 +126,6 @@
     },
     "/api/v1/auth/register": {
       "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "users"
         ],
@@ -118,7 +177,7 @@
         ],
         "responses": {
           "201": {
-            "$ref": "#/responses/createUserResponse"
+            "$ref": "#/responses/registerUserResponse"
           },
           "400": {
             "$ref": "#/responses/errorResponse"
@@ -126,164 +185,1111 @@
         }
       }
     },
+    "/api/v1/clients": {
+      "get": {
+        "tags": [
+          "clients"
+        ],
+        "operationId": "listClients"
+      },
+      "post": {
+        "tags": [
+          "clients"
+        ],
+        "operationId": "createClient",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Client"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/clients/{id}": {
+      "get": {
+        "tags": [
+          "clients"
+        ],
+        "operationId": "getClient",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "clients"
+        ],
+        "operationId": "updateClient",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "clients"
+        ],
+        "operationId": "deleteClient",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/communications": {
+      "get": {
+        "tags": [
+          "communications"
+        ],
+        "operationId": "listCommunications"
+      },
+      "post": {
+        "tags": [
+          "communications"
+        ],
+        "operationId": "createCommunication",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Communication"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/communications/{id}": {
+      "get": {
+        "tags": [
+          "communications"
+        ],
+        "operationId": "getCommunication",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "communications"
+        ],
+        "operationId": "updateCommunication",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "communications"
+        ],
+        "operationId": "deleteCommunication",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/companies": {
+      "get": {
+        "tags": [
+          "companies"
+        ],
+        "operationId": "listCompanies"
+      },
+      "post": {
+        "tags": [
+          "companies"
+        ],
+        "operationId": "createCompany",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Company"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/companies/{id}": {
+      "get": {
+        "tags": [
+          "companies"
+        ],
+        "operationId": "getCompany",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "companies"
+        ],
+        "operationId": "updateCompany",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "companies"
+        ],
+        "operationId": "deleteCompany",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/contracts": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "operationId": "listContracts"
+      },
+      "post": {
+        "tags": [
+          "contracts"
+        ],
+        "operationId": "createContract",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Contract"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/contracts/{id}": {
+      "get": {
+        "tags": [
+          "contracts"
+        ],
+        "operationId": "getContract",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "contracts"
+        ],
+        "operationId": "updateContract",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "contracts"
+        ],
+        "operationId": "deleteContract",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
     "/api/v1/documents": {
       "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "documents"
         ],
         "summary": "Create a new document.",
-        "operationId": "createDocument"
+        "operationId": "createDocument",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Document"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getDocumentResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/v1/documents/{id}": {
       "get": {
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "documents"
         ],
         "summary": "Get a document by ID.",
-        "operationId": "getDocument"
+        "operationId": "getDocument",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getDocumentResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "put": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "documents"
         ],
         "summary": "Update a document by ID.",
-        "operationId": "updateDocument"
+        "operationId": "updateDocument",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getDocumentResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "documents"
+        ],
+        "summary": "Delete a document by ID.",
+        "operationId": "deleteDocument",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/files": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "operationId": "listFiles"
+      },
+      "post": {
+        "tags": [
+          "files"
+        ],
+        "operationId": "createFile",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/File"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/files/{id}": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "operationId": "getFile",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "files"
+        ],
+        "operationId": "updateFile",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "files"
+        ],
+        "operationId": "deleteFile",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/invoices": {
+      "get": {
+        "tags": [
+          "invoices"
+        ],
+        "operationId": "listInvoices"
+      },
+      "post": {
+        "tags": [
+          "invoices"
+        ],
+        "operationId": "createInvoice",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Invoice"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/invoices/{id}": {
+      "get": {
+        "tags": [
+          "invoices"
+        ],
+        "operationId": "getInvoice",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "invoices"
+        ],
+        "operationId": "updateInvoice",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "invoices"
+        ],
+        "operationId": "deleteInvoice",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/meetings": {
+      "get": {
+        "tags": [
+          "meetings"
+        ],
+        "operationId": "listMeetings"
+      },
+      "post": {
+        "tags": [
+          "meetings"
+        ],
+        "operationId": "createMeeting",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Meeting"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/meetings/{id}": {
+      "get": {
+        "tags": [
+          "meetings"
+        ],
+        "operationId": "getMeeting",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "meetings"
+        ],
+        "operationId": "updateMeeting",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "meetings"
+        ],
+        "operationId": "deleteMeeting",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
       }
     },
     "/api/v1/notes": {
       "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "notes"
         ],
         "summary": "Create a new note.",
-        "operationId": "createNote"
+        "operationId": "createNote",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Note"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getNoteResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/v1/notes/{id}": {
       "get": {
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "notes"
         ],
         "summary": "Get a note by ID.",
         "operationId": "getNote",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/responses/getNoteResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "put": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "notes"
         ],
         "summary": "Update a note by ID.",
-        "operationId": "updateNote"
+        "operationId": "updateNote",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getNoteResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "delete": {
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "notes"
         ],
         "summary": "Delete a note by ID.",
-        "operationId": "deleteNote"
+        "operationId": "deleteNote",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "tags": [
+          "notifications"
+        ],
+        "operationId": "listNotifications"
+      },
+      "post": {
+        "tags": [
+          "notifications"
+        ],
+        "operationId": "createNotification",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Notification"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}": {
+      "get": {
+        "tags": [
+          "notifications"
+        ],
+        "operationId": "getNotification",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "notifications"
+        ],
+        "operationId": "updateNotification",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "notifications"
+        ],
+        "operationId": "deleteNotification",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
       }
     },
     "/api/v1/offers": {
       "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "offers"
         ],
-        "summary": "Create a new offer.",
-        "operationId": "createOffer"
+        "operationId": "createOffer",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Offer"
+            }
+          }
+        ]
       }
     },
     "/api/v1/offers/{id}": {
       "get": {
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "offers"
         ],
-        "summary": "Get an offer by ID.",
-        "operationId": "getOffer"
+        "operationId": "getOffer",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
       },
       "put": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "offers"
         ],
-        "summary": "Update an offer by ID.",
-        "operationId": "updateOffer"
+        "operationId": "updateOffer",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
       },
       "delete": {
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "offers"
         ],
-        "summary": "Delete an offer by ID.",
-        "operationId": "deleteOffer"
+        "operationId": "deleteOffer",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/products": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "operationId": "listProducts"
+      },
+      "post": {
+        "tags": [
+          "products"
+        ],
+        "operationId": "createProduct",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/products/{id}": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "operationId": "getProduct",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "products"
+        ],
+        "operationId": "updateProduct",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "products"
+        ],
+        "operationId": "deleteProduct",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/settings": {
+      "get": {
+        "tags": [
+          "settings"
+        ],
+        "operationId": "listSettings"
+      },
+      "post": {
+        "tags": [
+          "settings"
+        ],
+        "operationId": "createSetting",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Setting"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/settings/{id}": {
+      "get": {
+        "tags": [
+          "settings"
+        ],
+        "operationId": "getSetting",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "settings"
+        ],
+        "operationId": "updateSetting",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "settings"
+        ],
+        "operationId": "deleteSetting",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/api/v1/tags": {
+      "get": {
+        "tags": [
+          "tags"
+        ],
+        "operationId": "listTags"
+      },
+      "post": {
+        "tags": [
+          "tags"
+        ],
+        "operationId": "createTag",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/tags/{id}": {
+      "get": {
+        "tags": [
+          "tags"
+        ],
+        "operationId": "getTag",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "tags"
+        ],
+        "operationId": "updateTag",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "tags"
+        ],
+        "operationId": "deleteTag",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
       }
     },
     "/api/v1/tasks": {
       "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "tasks"
         ],
         "summary": "Create a new task.",
         "operationId": "createTask",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Task"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "$ref": "#/responses/createTaskResponse"
@@ -294,18 +1300,13 @@
         },
         "security": [
           {
-            "BearerAuth": [
-              "[]"
-            ]
+            "Bearer": []
           }
         ]
       }
     },
     "/api/v1/tasks/{id}": {
       "get": {
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "tasks"
         ],
@@ -314,6 +1315,7 @@
         "parameters": [
           {
             "type": "string",
+            "x-go-name": "ID",
             "name": "id",
             "in": "path",
             "required": true
@@ -326,15 +1328,14 @@
           "500": {
             "$ref": "#/responses/errorResponse"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "put": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "tasks"
         ],
@@ -342,40 +1343,19 @@
         "operationId": "updateTask",
         "parameters": [
           {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "description": {
-                  "type": "string",
-                  "x-go-name": "Description"
-                },
-                "end_time": {
-                  "type": "string",
-                  "x-go-name": "EndTime"
-                },
-                "start_time": {
-                  "type": "string",
-                  "x-go-name": "StartTime"
-                },
-                "title": {
-                  "type": "string",
-                  "x-go-name": "Title"
-                }
-              }
-            }
-          },
-          {
             "type": "string",
+            "x-go-name": "ID",
             "name": "id",
             "in": "path",
             "required": true
           },
           {
-            "name": "request",
+            "name": "Body",
             "in": "body",
-            "required": true
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Task"
+            }
           }
         ],
         "responses": {
@@ -385,12 +1365,14 @@
           "500": {
             "$ref": "#/responses/errorResponse"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "delete": {
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "tasks"
         ],
@@ -399,6 +1381,7 @@
         "parameters": [
           {
             "type": "string",
+            "x-go-name": "ID",
             "name": "id",
             "in": "path",
             "required": true
@@ -411,49 +1394,20 @@
           "500": {
             "$ref": "#/responses/errorResponse"
           }
-        }
-      }
-    },
-    "/api/v1/tasks/{id}/toggle": {
-      "put": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "tasks"
-        ],
-        "summary": "Toggle task completion.",
-        "operationId": "toggleTask",
-        "parameters": [
+        },
+        "security": [
           {
-            "type": "string",
-            "name": "id",
-            "in": "path",
-            "required": true
+            "Bearer": []
           }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/getTaskResponse"
-          },
-          "500": {
-            "$ref": "#/responses/errorResponse"
-          }
-        }
+        ]
       }
     },
     "/api/v1/users": {
       "post": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "description": "CreateUser (for consistency, though registration is preferred)",
         "tags": [
           "users"
         ],
-        "summary": "Create a new user.",
         "operationId": "createUser",
         "parameters": [
           {
@@ -486,98 +1440,557 @@
               }
             }
           }
-        ],
-        "responses": {
-          "201": {
-            "$ref": "#/responses/createUserResponse"
-          },
-          "400": {
-            "$ref": "#/responses/errorResponse"
-          }
-        }
+        ]
       }
     },
     "/api/v1/users/{id}": {
       "get": {
-        "produces": [
-          "application/json"
-        ],
         "tags": [
           "users"
         ],
-        "summary": "Get user by ID.",
-        "operationId": "getUser",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/getUserResponse"
-          },
-          "404": {
-            "$ref": "#/responses/errorResponse"
-          }
-        }
+        "summary": "Get a user by ID.",
+        "operationId": "getUser"
       }
+    }
+  },
+  "definitions": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "Apartment": {
+          "type": "string"
+        },
+        "Building": {
+          "type": "string"
+        },
+        "City": {
+          "type": "string"
+        },
+        "Country": {
+          "type": "string"
+        },
+        "Street": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
     },
-    "/debug": {
-      "get": {
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "debug"
-        ],
-        "summary": "Get debug information.",
-        "operationId": "getDebug",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/debugResponse"
-          }
+    "Analytic": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "Data": {},
+        "ID": {
+          "type": "string"
         }
-      }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/analytic"
     },
-    "/health": {
-      "get": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "health"
-        ],
-        "summary": "Check the health of the server.",
-        "operationId": "getHealth",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/healthResponse"
-          }
+    "Attendee": {
+      "type": "object",
+      "properties": {
+        "Email": {
+          "type": "string"
+        },
+        "UserID": {
+          "type": "string"
         }
-      }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/meeting"
     },
-    "/ping": {
-      "get": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "ping"
-        ],
-        "summary": "Ping the server to check if it's alive.",
-        "operationId": "getPing",
-        "responses": {
-          "200": {
-            "$ref": "#/responses/pingResponse"
+    "BirthDate": {
+      "type": "object",
+      "properties": {
+        "Day": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Month": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Year": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+    },
+    "Client": {
+      "type": "object",
+      "properties": {
+        "CompanyID": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "IsActive": {
+          "type": "boolean"
+        },
+        "Person": {
+          "$ref": "#/definitions/Person"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/client"
+    },
+    "Communication": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/communication"
+    },
+    "Company": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/company"
+    },
+    "Contract": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "CompanyID": {
+          "type": "string"
+        },
+        "Content": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/contract"
+    },
+    "Currency": {
+      "type": "object",
+      "properties": {
+        "Code": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+    },
+    "Document": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "CompanyID": {
+          "type": "string"
+        },
+        "ExpirationDate": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "IssuedBy": {
+          "type": "string"
+        },
+        "IssuedDate": {
+          "type": "string"
+        },
+        "Number": {
+          "type": "string"
+        },
+        "StorageReference": {
+          "$ref": "#/definitions/StorageReference"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "UserID": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/document"
+    },
+    "File": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "CompanyID": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "StorageReference": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/file"
+    },
+    "HumanName": {
+      "type": "object",
+      "properties": {
+        "FirstName": {
+          "type": "string"
+        },
+        "LastName": {
+          "type": "string"
+        },
+        "MiddleName": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+    },
+    "Invoice": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "CompanyID": {
+          "type": "string"
+        },
+        "DocumentID": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "InvoiceItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InvoiceItem"
           }
         }
-      }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/invoice"
+    },
+    "InvoiceItem": {
+      "type": "object",
+      "properties": {
+        "Amount": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "InvoiceID": {
+          "type": "string"
+        },
+        "ProductID": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/invoice"
+    },
+    "Meeting": {
+      "type": "object",
+      "properties": {
+        "Attendees": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Attendee"
+          }
+        },
+        "ClientID": {
+          "type": "string"
+        },
+        "CompanyID": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "MeetingProvider": {
+          "$ref": "#/definitions/MeetingProvider"
+        },
+        "TimeSlot": {
+          "$ref": "#/definitions/TimeSlot"
+        },
+        "Topic": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/meeting"
+    },
+    "MeetingProvider": {
+      "type": "object",
+      "properties": {
+        "ProviderName": {
+          "type": "string"
+        },
+        "URL": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/meeting"
+    },
+    "Money": {
+      "type": "object",
+      "properties": {
+        "Amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "Currency": {
+          "$ref": "#/definitions/Currency"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+    },
+    "Note": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "CompanyID": {
+          "type": "string"
+        },
+        "Content": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "UserID": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/note"
+    },
+    "Notification": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Message": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/notification"
+    },
+    "Offer": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "CompanyID": {
+          "type": "string"
+        },
+        "DocumentID": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "OfferItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OfferItem"
+          }
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/offer"
+    },
+    "OfferItem": {
+      "type": "object",
+      "properties": {
+        "Amount": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "Money": {
+          "$ref": "#/definitions/Money"
+        },
+        "ProductID": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/offer"
+    },
+    "Person": {
+      "type": "object",
+      "properties": {
+        "Address": {
+          "$ref": "#/definitions/Address"
+        },
+        "BirthDate": {
+          "$ref": "#/definitions/BirthDate"
+        },
+        "Name": {
+          "$ref": "#/definitions/HumanName"
+        },
+        "Phone": {
+          "$ref": "#/definitions/PhoneNumber"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+    },
+    "PhoneNumber": {
+      "type": "object",
+      "properties": {
+        "CountryCode": {
+          "type": "string"
+        },
+        "Number": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+    },
+    "Product": {
+      "type": "object",
+      "properties": {
+        "CompanyID": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Price": {
+          "$ref": "#/definitions/Money"
+        },
+        "Thumbnail": {
+          "$ref": "#/definitions/StorageReference"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/product"
+    },
+    "Setting": {
+      "type": "object",
+      "properties": {
+        "CompanyID": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "Key": {
+          "type": "string"
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/setting"
+    },
+    "StorageReference": {
+      "type": "object",
+      "properties": {
+        "ServiceName": {
+          "type": "string"
+        },
+        "URL": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "Name": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/tag"
+    },
+    "Task": {
+      "type": "object",
+      "properties": {
+        "CompanyID": {
+          "type": "string"
+        },
+        "Description": {
+          "type": "string"
+        },
+        "EndTime": {
+          "type": "string"
+        },
+        "ID": {
+          "type": "string"
+        },
+        "IsDone": {
+          "type": "boolean"
+        },
+        "StartTime": {
+          "type": "string"
+        },
+        "Title": {
+          "type": "string"
+        },
+        "UserID": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/task"
+    },
+    "TimeSlot": {
+      "type": "object",
+      "properties": {
+        "EndTime": {
+          "type": "string"
+        },
+        "StartTime": {
+          "type": "string"
+        },
+        "TimeZone": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/meeting"
+    },
+    "TokenPair": {
+      "type": "object",
+      "properties": {
+        "AccessToken": {
+          "type": "string"
+        },
+        "RefreshToken": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/application/service"
     }
   },
   "responses": {
@@ -629,35 +2042,220 @@
         }
       }
     },
+    "getAnalyticResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Analytic"
+      }
+    },
+    "getClientResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Client"
+      }
+    },
+    "getCommunicationResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Communication"
+      }
+    },
+    "getCompanyResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Company"
+      }
+    },
+    "getContractResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Contract"
+      }
+    },
+    "getDocumentResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Document"
+      }
+    },
+    "getFileResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/File"
+      }
+    },
+    "getInvoiceResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Invoice"
+      }
+    },
+    "getMeetingResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Meeting"
+      }
+    },
+    "getNoteResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Note"
+      }
+    },
+    "getNotificationResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Notification"
+      }
+    },
+    "getOfferResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Offer"
+      }
+    },
+    "getProductResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Product"
+      }
+    },
+    "getSettingResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Setting"
+      }
+    },
+    "getTagResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Tag"
+      }
+    },
     "getTaskResponse": {
       "description": "",
       "schema": {
-        "type": "object",
-        "properties": {
-          "description": {
-            "type": "string",
-            "x-go-name": "Description"
-          },
-          "end_time": {
-            "type": "string",
-            "x-go-name": "EndTime"
-          },
-          "id": {
-            "type": "string",
-            "x-go-name": "ID"
-          },
-          "start_time": {
-            "type": "string",
-            "x-go-name": "StartTime"
-          },
-          "title": {
-            "type": "string",
-            "x-go-name": "Title"
-          }
-        }
+        "$ref": "#/definitions/Task"
       }
     },
     "getUserResponse": {
+      "description": ""
+    },
+    "listAnalyticsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Analytic"
+        }
+      }
+    },
+    "listClientsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Client"
+        }
+      }
+    },
+    "listCommunicationsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Communication"
+        }
+      }
+    },
+    "listCompaniesResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Company"
+        }
+      }
+    },
+    "listContractsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Contract"
+        }
+      }
+    },
+    "listFilesResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/File"
+        }
+      }
+    },
+    "listInvoicesResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Invoice"
+        }
+      }
+    },
+    "listMeetingsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Meeting"
+        }
+      }
+    },
+    "listNotificationsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Notification"
+        }
+      }
+    },
+    "listProductsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Product"
+        }
+      }
+    },
+    "listSettingsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Setting"
+        }
+      }
+    },
+    "listTagsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Tag"
+        }
+      }
+    },
+    "loginUserResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/TokenPair"
+      }
+    },
+    "registerUserResponse": {
       "description": "",
       "schema": {
         "type": "object",
@@ -666,33 +2264,9 @@
             "type": "string",
             "x-go-name": "Email"
           },
-          "first_name": {
-            "type": "string",
-            "x-go-name": "FirstName"
-          },
           "id": {
             "type": "string",
             "x-go-name": "ID"
-          },
-          "last_name": {
-            "type": "string",
-            "x-go-name": "LastName"
-          },
-          "middle_name": {
-            "type": "string",
-            "x-go-name": "MiddleName"
-          }
-        }
-      }
-    },
-    "loginUserResponse": {
-      "description": "",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "x-go-name": "Token"
           }
         }
       }

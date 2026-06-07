@@ -21,6 +21,12 @@ func NewTaskHandler(deps *http_deps.Dependencies, logs *slog.Logger) *TaskHandle
 }
 
 // swagger:route POST /api/v1/tasks tasks createTask
+// Create a new task.
+// Security:
+//   Bearer:
+// responses:
+//   201: createTaskResponse
+//   400: errorResponse
 func (h *TaskHandler) CreateTask(c *gin.Context) {
 	var t task.Task
 	if err := c.ShouldBindJSON(&t); err != nil {
@@ -36,6 +42,12 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/tasks/{id} tasks getTask
+// Get task by ID.
+// security:
+//   Bearer:
+// responses:
+//   200: getTaskResponse
+//   500: errorResponse
 func (h *TaskHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetTaskByID.Handle(c.Request.Context(), query.FetchTaskByID{ID: id})
@@ -47,6 +59,12 @@ func (h *TaskHandler) GetByID(c *gin.Context) {
 }
 
 // swagger:route PUT /api/v1/tasks/{id} tasks updateTask
+// Update a task.
+// security:
+//   Bearer:
+// responses:
+//   200: getTaskResponse
+//   500: errorResponse
 func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	id := c.Param("id")
 	var t task.Task
@@ -64,6 +82,12 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 }
 
 // swagger:route DELETE /api/v1/tasks/{id} tasks deleteTask
+// Delete a task.
+// security:
+//   Bearer:
+// responses:
+//   200: deleteTaskResponse
+//   500: errorResponse
 func (h *TaskHandler) DeleteTask(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteTask.Handle(c.Request.Context(), command.DeleteTaskCommand{ID: id})
