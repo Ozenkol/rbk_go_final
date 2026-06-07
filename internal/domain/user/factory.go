@@ -40,6 +40,3 @@ func (f *UserFactory) CreateUser(humanName shared.HumanName, email string, passw
 
 }
 
-func hashPassword(password string) string {
-	return password
-}

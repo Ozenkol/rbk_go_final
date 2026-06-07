@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
-	"github.com/Ozenkol/rbk-go-final/internal/application/query"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/user"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
@@ -22,7 +21,11 @@ func NewAuthHandler(deps *http_deps.Dependencies, logs *slog.Logger) *AuthHandle
 	return &AuthHandler{deps: deps, logs: logs}
 }
 
-// RegisterUser handles user registration
+// swagger:route POST /api/v1/auth/register users registerUser
+// Register a new user and authenticate.
+// responses:
+//   201: registerUserResponse
+//   400: errorResponse
 func (h *AuthHandler) RegisterUser(c *gin.Context) {
 	var req http_requests.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -48,7 +51,11 @@ func (h *AuthHandler) RegisterUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, createdUserResponse(u))
 }
 
-// LoginUser handles user login
+// swagger:route POST /api/v1/auth/login users loginUser
+// Authenticate an existing user.
+// responses:
+//   200: loginUserResponse
+//   401: errorResponse
 func (h *AuthHandler) LoginUser(c *gin.Context) {
 	var req http_requests.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
