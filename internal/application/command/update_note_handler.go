@@ -9,10 +9,8 @@ import (
 type UpdateNoteCommand struct {
 	ID          string
 	UserID      string
-	Title       string
-	Description string
-	StartTime   string
-	EndTime     string
+	ClientID	string
+	Content     string
 }
 
 type UpdateNoteHandler struct {
@@ -23,33 +21,24 @@ func NewUpdateNoteHandler(noteRepo note.NoteRepositoryInterface) *UpdateNoteHand
 	return &UpdateNoteHandler{noteRepo: noteRepo}
 }
 
-func (h *UpdateTaskHandler) Handle(cmd UpdateTaskCommand) (string, error) {
-	existingTask, err := h.taskRepo.GetByID(cmd.ID)
+func (h *UpdateNoteHandler) Handle(cmd UpdateNoteCommand) (string, error) {
+	existingNote, err := h.noteRepo.GetByID(cmd.ID)
 	if err != nil {
 		return "", err
 	}
-	if existingTask == nil {
-		return "", errors.New("task not found")
+	if existingNote == nil {
+		return "", errors.New("note not found")
 	}
-	if cmd.UserID != existingTask.UserID {
-		return "", errors.New("user does not have permission to update this task")
+	if cmd.UserID != existingNote.UserID {
+		return "", errors.New("user does not have permission to update this note")
 	}
-	if cmd.Title != "" {
-		existingTask.Title = cmd.Title
-	}
-	if cmd.Description != "" {
-		existingTask.Description = cmd.Description
-	}
-	if cmd.StartTime != "" {
-		existingTask.StartTime = cmd.StartTime
-	}
-	if cmd.EndTime != "" {
-		existingTask.EndTime = cmd.EndTime
+	if cmd.Content != "" {
+		existingNote.Content = cmd.Content
 	}
 	
-	savedTask, err := h.taskRepo.Update(existingTask)
+	savedNote, err := h.noteRepo.Update(existingNote)
 	if err != nil {
 		return "", err
 	}
-	return savedTask.ID, nil
+	return savedNote.ID, nil
 }
