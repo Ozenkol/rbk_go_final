@@ -5,4 +5,5 @@ type NoteRepositoryInterface interface {
 	GetByID(id string) (*Note, error)
 	Update(note *Note) (*Note, error)
 	Delete(id string) error
+	List() ([]*Note, error)
 }

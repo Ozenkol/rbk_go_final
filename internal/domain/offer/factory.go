@@ -1,35 +1,19 @@
 package offer
 
-import "github.com/Ozenkol/rbk-go-final/internal/domain/product"
-
 type OfferFactoryInterface interface {
-	CreateOffer(userID, clientID, title, description string, productIDs []string) (*Offer, error)
+	CreateOffer(clientID string) (*Offer, error)
 }
 
 type OfferFactory struct {
-	productRepository product.ProductRepositoryInterface
+	productRepository any
 }
 
-func NewOfferFactory(productRepository product.ProductRepositoryInterface) OfferFactoryInterface {
-	return &OfferFactory{
-		productRepository: productRepository,
-	}
+func NewOfferFactory(productRepository any) OfferFactoryInterface {
+	return &OfferFactory{productRepository: productRepository}
 }
 
-func (f *OfferFactory) CreateOffer(userID, clientID, title, description string, productIDs []string) (*Offer, error) {
-
-	offer := &Offer{
-		ClientID:   clientID,
-		DocumentID: "",
-	}
-
-	for _, productID := range productIDs {
-		product, err := f.productRepository.GetProductByID(productID)
-		if err != nil {
-			return nil, err
-		}
-		offer.AddOfferItem(*product)
-	}
-
-	return offer, nil
+func (f *OfferFactory) CreateOffer(clientID string) (*Offer, error) {
+	return &Offer{
+		ClientID: clientID,
+	}, nil
 }

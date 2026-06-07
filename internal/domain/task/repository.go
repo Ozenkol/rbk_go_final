@@ -5,4 +5,5 @@ type TaskRepositoryInterface interface {
 	GetByID(id string) (*Task, error)
 	Update(task *Task) (*Task, error)
 	Delete(id string) error
+	List() ([]*Task, error)
 }

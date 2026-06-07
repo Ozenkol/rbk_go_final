@@ -6,63 +6,56 @@ import (
 )
 
 type TagModel struct {
-	gorm.Model
-	ID       string `gorm:"primaryKey"`
-	ClientID string
-	Name     string
+	ID   string `gorm:"primaryKey"`
 }
 
 type TagRepository struct {
-	DB *gorm.DB
+	db *gorm.DB
 }
 
 func NewTagRepository(db *gorm.DB) (tag.TagRepositoryInterface, error) {
 	if err := db.AutoMigrate(&TagModel{}); err != nil {
 		return nil, err
 	}
-	return &TagRepository{DB: db}, nil
+	return &TagRepository{db: db}, nil
 }
 
-func (r *TagRepository) Create(tag *tag.Tag) error {
-	model := toTagModel(tag)
-	return r.DB.Create(&model).Error
+func (r *TagRepository) Create(t *tag.Tag) (*tag.Tag, error) {
+	model := &TagModel{ID: t.ID}
+	if err := r.db.Create(model).Error; err != nil {
+		return nil, err
+	}
+	return &tag.Tag{ID: model.ID}, nil
 }
 
 func (r *TagRepository) GetByID(id string) (*tag.Tag, error) {
 	var model TagModel
-	if err := r.DB.First(&model, "id = ?", id).Error; err != nil {
+	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
-	return toTagDomain(&model), nil
+	return &tag.Tag{ID: model.ID}, nil
 }
 
-func (r *TagRepository) Update(tag *tag.Tag) (*tag.Tag, error) {
-	var model TagModel
-	if err := r.DB.First(&model, "id = ?", tag.ID).Error; err != nil {
+func (r *TagRepository) Update(t *tag.Tag) (*tag.Tag, error) {
+	model := &TagModel{ID: t.ID}
+	if err := r.db.Save(model).Error; err != nil {
 		return nil, err
 	}
-	model.Name = tag.Name
-	if err := r.DB.Save(&model).Error; err != nil {
-		return nil, err
-	}
-	return toTagDomain(&model), nil
+	return &tag.Tag{ID: model.ID}, nil
 }
-
 
 func (r *TagRepository) Delete(id string) error {
-	return r.DB.Delete(&TagModel{}, "id = ?", id).Error
+	return r.db.Delete(&TagModel{}, "id = ?", id).Error
 }
 
-func toTagModel(tag *tag.Tag) *TagModel {
-	return &TagModel{
-		ID:       tag.ID,
-		Name:     tag.Name,
+func (r *TagRepository) List() ([]*tag.Tag, error) {
+	var models []TagModel
+	if err := r.db.Find(&models).Error; err != nil {
+		return nil, err
 	}
-}
-
-func toTagDomain(model *TagModel) *tag.Tag {
-	return &tag.Tag{
-		ID:       model.ID,
-		Name:     model.Name,
+	tags := make([]*tag.Tag, len(models))
+	for idx, m := range models {
+		tags[idx] = &tag.Tag{ID: m.ID}
 	}
+	return tags, nil
 }

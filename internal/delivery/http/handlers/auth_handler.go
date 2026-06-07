@@ -6,6 +6,8 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/user"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
 	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
 	"github.com/gin-gonic/gin"
@@ -20,116 +22,52 @@ func NewAuthHandler(deps *http_deps.Dependencies, logs *slog.Logger) *AuthHandle
 	return &AuthHandler{deps: deps, logs: logs}
 }
 
-// swagger:route POST /api/v1/auth/register users registerUser
-//
-// Register a new user and authenticate.
-//
-// Consumes:
-// - application/json
-//
-// Produces:
-// - application/json
-//
-// responses:
-//   201: createUserResponse
-//   400: errorResponse
+// RegisterUser handles user registration
 func (h *AuthHandler) RegisterUser(c *gin.Context) {
-    var req http_requests.CreateUserRequest
-    if err := c.ShouldBindJSON(&req); err != nil {
-        h.logs.Error("Invalid request body", slog.Any("error", err))
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-
-    // explicit mapping — delivery layer owns this translation
-    cmd := command.CreateUserCommand{
-        FirstName:  req.FirstName,
-        MiddleName: req.MiddleName,
-        LastName:   req.LastName,
-        Email:      req.Email,
-        Password:   req.Password,
-    }
-
-    id, err := h.deps.App.Commands.CreateUser.Handle(cmd)
-    if err != nil {
-        h.logs.Error("Failed to create user", slog.Any("error", err))
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-
-    _, err = h.deps.App.Queries.GetUserByID.Handle(query.FetchUserQuery{UserID: id})
-    if err != nil {
-        h.logs.Error("Failed to fetch user", slog.Any("error", err))
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-
-    token, err := h.deps.App.Services.AuthService.Authenticate(cmd.Email, cmd.Password)
-    if err != nil {
-        h.logs.Error("Authentication failed", slog.Any("error", err))
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
-        return
-    }
-    h.logs.Info("User registered and authenticated", slog.String("user_id", id))
-    c.JSON(http.StatusCreated, 
-        gin.H{
-            "token": token,
-        },
-    )
-}
-
-
-// swagger:route POST /api/v1/auth/login users loginUser
-//
-// Authenticate an existing user.
-//
-// Consumes:
-// - application/json
-//
-// Produces:
-// - application/json
-// responses:
-//   200: loginUserResponse
-//   400: errorResponse
-
-func (h *AuthHandler) LoginUser(c *gin.Context) {
-	var req http_requests.LoginUserRequest
-    h.logs.Info("Login attempt")
+	var req http_requests.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		h.logs.Error("Invalid request body", slog.Any("error", err))
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	h.logs.Info("Login attempt", slog.String("email", req.Email))
 
-	token, err := h.deps.App.Services.AuthService.Authenticate(req.Email, req.Password)
+	u, err := h.deps.App.Commands.CreateUser.Handle(c.Request.Context(), command.CreateUserCommand{
+		User: &user.User{
+			HumanName: shared.HumanName{
+				FirstName: req.FirstName,
+				LastName:  req.LastName,
+			},
+			Email:    req.Email,
+			Password: req.Password, // Command handler should handle hashing if following factory
+		},
+	})
 	if err != nil {
-		h.logs.Error("Authentication failed", slog.Any("error", err))
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	h.logs.Info("User logged in", slog.String("email", req.Email))
-	c.JSON(http.StatusOK, gin.H{"token": token})
+
+	c.JSON(http.StatusCreated, createdUserResponse(u))
 }
 
-// swagger:response loginUserResponse
-type LoginUserResponse struct {
-	// in: body
-	Body struct {
-		Token string `json:"token"`
+// LoginUser handles user login
+func (h *AuthHandler) LoginUser(c *gin.Context) {
+	var req http_requests.LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
+
+	tokenPair, err := h.deps.App.Services.AuthService.Authenticate(req.Email, req.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, tokenPair)
 }
 
-// swagger:parameters loginUser
-type LoginUserRequestParams struct {
-	// in: body
-	// required: true
-	Body struct {
-        // required: true
-		// default: test@example.com
-		Email    string `json:"email"`
-        // required: true
-		// default: 123456
-		Password string `json:"password"`
+func createdUserResponse(u *user.User) gin.H {
+	return gin.H{
+		"id":    u.ID,
+		"email": u.Email,
 	}
 }

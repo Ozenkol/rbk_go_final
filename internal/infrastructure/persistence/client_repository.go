@@ -29,29 +29,40 @@ type ClientRepository struct {
 
 func NewClientRepository(db *gorm.DB) (client.ClientRepositoryInterface, error) {
 	if err := db.AutoMigrate(&ClientModel{}); err != nil {
-		panic(err) // Handle error properly in production
+		return nil, err
 	}
 	return &ClientRepository{db: db}, nil
 }
 
-func (r *ClientRepository) Save(client *client.Client) (*client.Client, error) {
-	clientModel := toClientModel(client)
-	err := r.db.Save(clientModel).Error
-	if err != nil {
+func (r *ClientRepository) Create(c *client.Client) (*client.Client, error) {
+	model := toClientModel(c)
+	if err := r.db.Create(model).Error; err != nil {
 		return nil, err
 	}
-	return toClientDomain(clientModel), nil
+	return toClientDomain(model), nil
 }
 
-func (r *ClientRepository) FindByID(id string) (*client.Client, error) {
+func (r *ClientRepository) GetByID(id string) (*client.Client, error) {
 	var model ClientModel
-	if err := r.db.Where("id = ?", id).First(&model).Error; err != nil {
+	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return toClientDomain(&model), nil
 }
 
-func (r *ClientRepository) FindAll() ([]*client.Client, error) {
+func (r *ClientRepository) Update(c *client.Client) (*client.Client, error) {
+	model := toClientModel(c)
+	if err := r.db.Save(model).Error; err != nil {
+		return nil, err
+	}
+	return toClientDomain(model), nil
+}
+
+func (r *ClientRepository) Delete(id string) error {
+	return r.db.Delete(&ClientModel{}, "id = ?", id).Error
+}
+
+func (r *ClientRepository) List() ([]*client.Client, error) {
 	var models []ClientModel
 	if err := r.db.Find(&models).Error; err != nil {
 		return nil, err
@@ -61,15 +72,6 @@ func (r *ClientRepository) FindAll() ([]*client.Client, error) {
 		clients[i] = toClientDomain(&model)
 	}
 	return clients, nil
-}
-
-func (r *ClientRepository) Update(client *client.Client) error {
-	clientModel := toClientModel(client)
-	return r.db.Save(clientModel).Error
-}
-
-func (r *ClientRepository) Delete(id string) error {
-	return r.db.Where("id = ?", id).Delete(&ClientModel{}).Error
 }
 
 func toClientDomain(clientModel *ClientModel) *client.Client {

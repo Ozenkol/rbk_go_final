@@ -1,8 +1,9 @@
 package meeting
 
 type MeetingRepositoryInterface interface {
-	Save(meeting *Meeting) error
-	FindByID(id string) (*Meeting, error)
-	Update(meeting *Meeting) error
+	Create(meeting *Meeting) (*Meeting, error)
+	GetByID(id string) (*Meeting, error)
+	Update(meeting *Meeting) (*Meeting, error)
 	Delete(id string) error
+	List() ([]*Meeting, error)
 }
