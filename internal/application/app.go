@@ -24,6 +24,7 @@ type Commands struct {
 type Queries struct {
 	GetUserByID *query.FetchUserHandler
 	GetTaskByID *query.FetchTaskByIDHandler
+	GetNoteById *query.FetchNoteByIdHandler
 }
 
 type Services struct {
@@ -37,8 +38,10 @@ func NewApplication(
 	createClientHandler command.CreateClientHandler,
 	deleteTaskHandler command.DeleteTaskHandler,
 	updateTaskHandler command.UpdateTaskHandler,
+
 	getUserByIDHandler query.FetchUserHandler,
 	getTaskByIDHandler query.FetchTaskByIDHandler,
+	getNoteByIdHandler query.FetchNoteByIdHandler,
 	authService service.AuthService,
 ) *Application {
 	return &Application{
@@ -53,6 +56,7 @@ func NewApplication(
 		Queries: Queries{
 			GetUserByID: &getUserByIDHandler,
 			GetTaskByID: &getTaskByIDHandler,
+			GetNoteById: &getNoteByIdHandler,
 		},
 		Services: Services{
 			AuthService: &authService,

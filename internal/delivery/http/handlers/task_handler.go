@@ -30,6 +30,9 @@ func NewTaskHandler(deps *http_deps.Dependencies, logs *slog.Logger) *TaskHandle
 // Produces:
 // - application/json
 //
+// Security:
+//   - BearerAuth: []
+//
 // responses:
 //   201: createTaskResponse
 //   400: errorResponse
@@ -39,7 +42,10 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	tokenString := c.GetHeader("Authorization")
+	userId, err := h.deps.App.Services.AuthService.GetUserByToken(tokenString)
 	cmd := command.CreateTaskCommand{
+		UserID: userId,
 		Title:       req.Title,
 		Description: req.Description,
 		StartTime:   req.StartTime,

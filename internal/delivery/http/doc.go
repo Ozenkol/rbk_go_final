@@ -1,19 +1,17 @@
-// internal/delivery/http/doc.go
-
-// Package http_delivery CRM API
+// Package classification My API.
 //
-// # CRM management API
+// Documentation for My API.
 //
-// Schemes: http
-// Host: localhost:8081
-// BasePath: /
-// Version: 1.0.0
+//	Schemes: http
+//	Host: localhost:8081
 //
-// Consumes:
-// - application/json
+//	Version: 1.0.0
 //
-// Produces:
-// - application/json
+//	SecurityDefinitions:
+//	  Bearer:
+//	    type: apiKey
+//	    name: Authorization
+//	    in: header
 //
 // swagger:meta
 package http_delivery

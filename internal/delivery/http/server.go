@@ -11,16 +11,16 @@ import (
 	"syscall"
 	"time"
 
-	_ "github.com/Ozenkol/rbk-go-final/api"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 type Mode string
 
 const (
-	Development Mode = "dev"
-	Production  Mode = "prod"
+	Debug Mode = "debug"
+	Release Mode = "release"
 )
 
 type ServerConfig struct {
@@ -44,7 +44,7 @@ func DefaultConfig() ServerConfig {
 	return ServerConfig{
 		Host:            "localhost",
 		Port:            8081,
-		Mode:            Development,
+		Mode:            Debug,
 		ReadTimeout:     30 * time.Second,
 		WriteTimeout:    30 * time.Second,
 		IdleTimeout:     60 * time.Second,
@@ -59,6 +59,21 @@ func NewServer(cfg ServerConfig, logger *slog.Logger, deps http_deps.Dependencie
 
 	engine := gin.New()
 
+	engine.Use(gin.Logger())
+	engine.Use(gin.Recovery())
+
+	engine.Use(cors.New(cors.Config{
+		AllowOrigins: []string{
+			"http://localhost:8081",
+		},
+		AllowMethods: []string{
+			"GET", "POST", "PUT", "DELETE", "OPTIONS",
+		},
+		AllowHeaders: []string{
+			"Authorization",
+			"Content-Type",
+		},
+	}))
 	
 
 	registerRoutes(engine, logger, deps)

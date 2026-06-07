@@ -94,11 +94,13 @@ func (h *AuthHandler) RegisterUser(c *gin.Context) {
 
 func (h *AuthHandler) LoginUser(c *gin.Context) {
 	var req http_requests.LoginUserRequest
+    h.logs.Info("Login attempt")
 	if err := c.ShouldBindJSON(&req); err != nil {
 		h.logs.Error("Invalid request body", slog.Any("error", err))
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	h.logs.Info("Login attempt", slog.String("email", req.Email))
 
 	token, err := h.deps.App.Services.AuthService.Authenticate(req.Email, req.Password)
 	if err != nil {
@@ -123,7 +125,11 @@ type LoginUserRequestParams struct {
 	// in: body
 	// required: true
 	Body struct {
+        // required: true
+		// default: test@example.com
 		Email    string `json:"email"`
+        // required: true
+		// default: 123456
 		Password string `json:"password"`
 	}
 }

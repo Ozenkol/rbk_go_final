@@ -47,7 +47,7 @@ type Money struct {
 	Currency Currency
 }
 
-func NewMoney(amount float64, currency Currency) Money {
+func (*Money) NewMoney(amount float64, currency Currency) Money {
 	if amount < 0 {
 		panic("Amount cannot be negative")
 	}
@@ -57,7 +57,7 @@ func NewMoney(amount float64, currency Currency) Money {
 	}
 }
 
-func NewHumanName(firstName, middleName, lastName string) HumanName {
+func (*HumanName) NewHumanName(firstName, middleName, lastName string) HumanName {
 	if firstName == "" || lastName == "" {
 		panic("First name and last name cannot be empty")
 	}
@@ -71,7 +71,7 @@ func NewHumanName(firstName, middleName, lastName string) HumanName {
 	}
 }
 
-func NewBirthDate(day, month, year int) BirthDate {
+func (*BirthDate) NewBirthDate(day, month, year int) BirthDate {
 	if day < 1 || day > 31 {
 		panic("Day must be between 1 and 31")
 	}
@@ -88,7 +88,7 @@ func NewBirthDate(day, month, year int) BirthDate {
 	}
 }
 
-func NewAddress(country, city, street, building, apartment string) Address {
+func (*Address) NewAddress(country, city, street, building, apartment string) Address {
 	if country == "" || city == "" || street == "" || building == "" {
 		panic("Country, city, street and building cannot be empty")
 	}
@@ -104,7 +104,7 @@ func NewAddress(country, city, street, building, apartment string) Address {
 	}
 }
 
-func NewPhoneNumber(countryCode, number string) PhoneNumber {
+func (*PhoneNumber) NewPhoneNumber(countryCode, number string) PhoneNumber {
 	if countryCode == "" || number == "" {
 		panic("Country code and number cannot be empty")
 	}
@@ -114,7 +114,7 @@ func NewPhoneNumber(countryCode, number string) PhoneNumber {
 	}
 }
 
-func NewPerson(name HumanName, birthDate BirthDate, address Address, phone PhoneNumber) Person {
+func (*Person) NewPerson(name HumanName, birthDate BirthDate, address Address, phone PhoneNumber) Person {
 	return Person{
 		Name:      name,
 		BirthDate: birthDate,

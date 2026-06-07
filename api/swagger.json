@@ -1,21 +1,14 @@
 {
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
   "schemes": [
     "http"
   ],
   "swagger": "2.0",
   "info": {
-    "description": "# CRM management API",
-    "title": "CRM API",
+    "description": "Documentation for My API.",
+    "title": "My API.",
     "version": "1.0.0"
   },
   "host": "localhost:8081",
-  "basePath": "/",
   "paths": {
     "/api/v1/auth/login": {
       "post": {
@@ -30,6 +23,32 @@
         ],
         "summary": "Authenticate an existing user.",
         "operationId": "loginUser",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "email",
+                "password"
+              ],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "default": "test@example.com",
+                  "x-go-name": "Email"
+                },
+                "password": {
+                  "type": "string",
+                  "default": "123456",
+                  "x-go-name": "Password"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "200": {
             "$ref": "#/responses/loginUserResponse"
@@ -60,25 +79,37 @@
             "required": true,
             "schema": {
               "type": "object",
+              "required": [
+                "first_name",
+                "middle_name",
+                "last_name",
+                "email",
+                "password"
+              ],
               "properties": {
                 "email": {
                   "type": "string",
+                  "default": "test@example.com",
                   "x-go-name": "Email"
                 },
                 "first_name": {
                   "type": "string",
+                  "default": "John",
                   "x-go-name": "FirstName"
                 },
                 "last_name": {
                   "type": "string",
+                  "default": "Adams",
                   "x-go-name": "LastName"
                 },
                 "middle_name": {
                   "type": "string",
+                  "default": "Smith",
                   "x-go-name": "MiddleName"
                 },
                 "password": {
                   "type": "string",
+                  "default": "123456",
                   "x-go-name": "Password"
                 }
               }
@@ -90,6 +121,322 @@
             "$ref": "#/responses/createUserResponse"
           },
           "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/api/v1/documents": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "documents"
+        ],
+        "summary": "Create a new document.",
+        "operationId": "createDocument"
+      }
+    },
+    "/api/v1/documents/{id}": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "documents"
+        ],
+        "summary": "Get a document by ID.",
+        "operationId": "getDocument"
+      },
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "documents"
+        ],
+        "summary": "Update a document by ID.",
+        "operationId": "updateDocument"
+      }
+    },
+    "/api/v1/notes": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "notes"
+        ],
+        "summary": "Create a new note.",
+        "operationId": "createNote"
+      }
+    },
+    "/api/v1/notes/{id}": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "notes"
+        ],
+        "summary": "Get a note by ID.",
+        "operationId": "getNote",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getNoteResponse"
+          }
+        }
+      },
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "notes"
+        ],
+        "summary": "Update a note by ID.",
+        "operationId": "updateNote"
+      },
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "notes"
+        ],
+        "summary": "Delete a note by ID.",
+        "operationId": "deleteNote"
+      }
+    },
+    "/api/v1/offers": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "offers"
+        ],
+        "summary": "Create a new offer.",
+        "operationId": "createOffer"
+      }
+    },
+    "/api/v1/offers/{id}": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "offers"
+        ],
+        "summary": "Get an offer by ID.",
+        "operationId": "getOffer"
+      },
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "offers"
+        ],
+        "summary": "Update an offer by ID.",
+        "operationId": "updateOffer"
+      },
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "offers"
+        ],
+        "summary": "Delete an offer by ID.",
+        "operationId": "deleteOffer"
+      }
+    },
+    "/api/v1/tasks": {
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Create a new task.",
+        "operationId": "createTask",
+        "responses": {
+          "201": {
+            "$ref": "#/responses/createTaskResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": [
+              "[]"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/tasks/{id}": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Get task by ID.",
+        "operationId": "getTask",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getTaskResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Update a task.",
+        "operationId": "updateTask",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "x-go-name": "Description"
+                },
+                "end_time": {
+                  "type": "string",
+                  "x-go-name": "EndTime"
+                },
+                "start_time": {
+                  "type": "string",
+                  "x-go-name": "StartTime"
+                },
+                "title": {
+                  "type": "string",
+                  "x-go-name": "Title"
+                }
+              }
+            }
+          },
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getTaskResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Delete a task.",
+        "operationId": "deleteTask",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/deleteTaskResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/api/v1/tasks/{id}/toggle": {
+      "put": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Toggle task completion.",
+        "operationId": "toggleTask",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getTaskResponse"
+          },
+          "500": {
             "$ref": "#/responses/errorResponse"
           }
         }
@@ -177,10 +524,88 @@
           }
         }
       }
+    },
+    "/debug": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "debug"
+        ],
+        "summary": "Get debug information.",
+        "operationId": "getDebug",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/debugResponse"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "health"
+        ],
+        "summary": "Check the health of the server.",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/healthResponse"
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "ping"
+        ],
+        "summary": "Ping the server to check if it's alive.",
+        "operationId": "getPing",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/pingResponse"
+          }
+        }
+      }
     }
   },
   "responses": {
+    "createTaskResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "x-go-name": "ID"
+          }
+        }
+      }
+    },
     "createUserResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "x-go-name": "Message"
+          }
+        }
+      }
+    },
+    "deleteTaskResponse": {
       "description": "",
       "schema": {
         "type": "object",
@@ -204,8 +629,80 @@
         }
       }
     },
+    "getTaskResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "x-go-name": "Description"
+          },
+          "end_time": {
+            "type": "string",
+            "x-go-name": "EndTime"
+          },
+          "id": {
+            "type": "string",
+            "x-go-name": "ID"
+          },
+          "start_time": {
+            "type": "string",
+            "x-go-name": "StartTime"
+          },
+          "title": {
+            "type": "string",
+            "x-go-name": "Title"
+          }
+        }
+      }
+    },
     "getUserResponse": {
-      "description": ""
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "x-go-name": "Email"
+          },
+          "first_name": {
+            "type": "string",
+            "x-go-name": "FirstName"
+          },
+          "id": {
+            "type": "string",
+            "x-go-name": "ID"
+          },
+          "last_name": {
+            "type": "string",
+            "x-go-name": "LastName"
+          },
+          "middle_name": {
+            "type": "string",
+            "x-go-name": "MiddleName"
+          }
+        }
+      }
+    },
+    "loginUserResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "x-go-name": "Token"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   }
 }

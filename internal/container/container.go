@@ -181,9 +181,22 @@ func (c *Container) App() *application.Application {
 					c.UserRepository(),
 					c.UserFactory(),
 				),
+				CreateTask: command.NewCreateTaskHandler(
+					c.TaskRepository(),
+				),
+				DeleteTask: command.NewDeleteTaskHandler(
+					c.TaskRepository(),
+				),
+				UpdateTask: command.NewUpdateTaskHandler(
+					c.TaskRepository(),
+				),
+				CreateClient: command.NewCreateClientHandler(
+					c.ClientRepository(),
+				),
 			},
 			Queries: application.Queries{
 				GetUserByID: query.NewFetchUserHandler(c.UserRepository()),
+				GetTaskByID: query.NewFetchTaskByIDHandler(c.TaskRepository()),
 			},
 			 Services: application.Services{
 				AuthService: service.NewAuthService(c.UserRepository(), c.TokenRepository()),

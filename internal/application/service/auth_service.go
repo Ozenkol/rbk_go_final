@@ -68,6 +68,21 @@ func (s *AuthService) Authenticate(username, password string) (TokenPair, error)
 	}, nil
 }
 
+func (s *AuthService) GetUserByToken(token string) (string, error) {
+	valid, err := validateToken(token)
+	if err != nil {
+		return "", err
+	}
+	if !valid {
+		return "", err
+	}
+	userId, err := getUserIdFromToken(token)
+	if err != nil {
+		return "", err
+	}
+	return userId, nil
+}
+
 func (s *AuthService) ValidateAccessToken(accessToken string) (bool, error) {
 	valid, err := validateToken(accessToken)
 	if err != nil {
@@ -132,6 +147,27 @@ func validateToken(tokenString string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func getUserIdFromToken(tokenString string) (string, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("invalid token signing method")
+		}
+		return secretKey, nil
+	})
+	if err != nil {
+		return "", err
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", fmt.Errorf("invalid token claims")
+	}
+	jti, ok := claims["user_id"].(string)
+	if !ok {
+		return "", fmt.Errorf("invalid refresh token ID")
+	}
+	return jti, nil
 }
 
 func getRefreshIdFromToken(tokenString string) (string, error) {

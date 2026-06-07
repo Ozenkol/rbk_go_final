@@ -4,6 +4,7 @@ import "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 
 type Document struct {
 	ID               string
+	UserID 		 		string
 	ClientID         string
 	Type             string
 	Number           string

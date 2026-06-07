@@ -1,6 +1,7 @@
 package http_delivery
 
 import (
+	"fmt"
 	"log/slog"
 
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
@@ -11,12 +12,6 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// @title			CRM API
-// @version		1.0
-// @description	Test API
-// @host			localhost:8081
-// @BasePath		/
-// @schemes		http
 func registerRoutes(engine *gin.Engine, log *slog.Logger, deps http_deps.Dependencies) {
 	// serve spec
 	engine.GET("/swagger.json", func(c *gin.Context) {
@@ -29,11 +24,49 @@ func registerRoutes(engine *gin.Engine, log *slog.Logger, deps http_deps.Depende
 	))
 
 
-	engine.GET("/ping", handlers.Ping)
+	// swagger:route GET /ping ping getPing
+	//
+	// Ping the server to check if it's alive.
+	//
+	// Produces:
+	// - application/json
+	// responses:
+	//   200: pingResponse
+	engine.GET("/ping", func(c *gin.Context) {
+		log.Info("Ping received")
+		c.JSON(200, gin.H{"message": "pong"})
+	})
 
+	// swagger:route GET /health health getHealth
+	//
+	// Check the health of the server.
+	//
+	// Produces:
+	// - application/json
+	// responses:
+	//   200: healthResponse
 	engine.GET("/health", func(c *gin.Context) {
 		log.Info("Health check")
 		c.JSON(200, gin.H{"status": "ok"})
+	})
+
+	// swagger:route GET /debug debug getDebug
+	//
+	// Get debug information.
+	//
+	// Produces:
+	// - application/json
+	// Consumes:
+	// - application/json
+	// responses:
+	//   200: debugResponse
+	engine.GET("/debug", func(c *gin.Context) {
+		var headers []string
+		log.Info("Debug endpoint called")
+		for k, v := range c.Request.Header {
+			headers = append(headers, fmt.Sprintf("%s: %s", k, v))
+		}
+		c.JSON(200, gin.H{"ok": true, "headers": headers})
 	})
 
 	userHandler := handlers.NewUserHandler(&deps, log)
@@ -43,7 +76,7 @@ func registerRoutes(engine *gin.Engine, log *slog.Logger, deps http_deps.Depende
 	offerHandler := handlers.NewOfferHandler(&deps, log)
 	taskHandler := handlers.NewTaskHandler(&deps, log)
 
-	authMiddleware := http_middleware.NewAuthMiddleware(&deps)
+	authMiddleware := http_middleware.NewAuthMiddleware(&deps, log)
 
 	v1 := engine.Group("/api/v1")
 	{
@@ -58,6 +91,7 @@ func registerRoutes(engine *gin.Engine, log *slog.Logger, deps http_deps.Depende
 		auth := v1.Group("/auth")
 		{
 			auth.POST("/register", authHandler.RegisterUser)
+			auth.POST("/login", authHandler.LoginUser)
 		}
 
 		// Offers

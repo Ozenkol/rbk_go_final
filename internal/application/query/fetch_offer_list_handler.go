@@ -10,13 +10,18 @@ type OfferFilter struct {
 }
 
 type FetchOfferQuery struct {
-	OfferID string
 	Filter OfferFilter
 	Pagination application_shared.Pagination
 }
 
 type FetchOfferHandler struct {
 	offerRepository offer.OfferRepositoryInterface
+	offerQueryRepository OfferQueryRepositoryInterface
+}
+
+type OfferQueryRepositoryInterface interface {
+	GetByID(id string) (*offer.Offer, error)
+	FindByFilter(filter OfferFilter, pagination application_shared.Pagination) ([]*offer.Offer, error)
 }
 
 func NewFetchOfferHandler(offerRepo offer.OfferRepositoryInterface) *FetchOfferHandler {
@@ -24,12 +29,9 @@ func NewFetchOfferHandler(offerRepo offer.OfferRepositoryInterface) *FetchOfferH
 }
 
 func (h *FetchOfferHandler) Handle(query FetchOfferQuery) ([]*offer.Offer, error) {
-	if query.OfferID != "" {
-		existingOffer, err := h.offerRepository.GetByID(query.OfferID)
-		if err != nil {
-			return nil, err
-		}
-		return []*offer.Offer{existingOffer}, nil
+	offers, err := h.offerQueryRepository.FindByFilter(query.Filter, query.Pagination)
+	if err != nil {
+		return nil, err
 	}
-	return []*offer.Offer{}, nil
+	return offers, nil
 }
