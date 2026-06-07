@@ -6,8 +6,8 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/note"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
-	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,77 +18,58 @@ type NoteHandler struct {
 
 func NewNoteHandler(deps *http_deps.Dependencies, logs *slog.Logger) *NoteHandler {
 	return &NoteHandler{deps: deps, logs: logs}
-}	
-
+}
 
 // swagger:route POST /api/v1/notes notes createNote
-//
-// Create a new note.
-//
-// Consumes:
-// - application/json
-// Produces:
-// - application/json
-func (h *NoteHandler) CreateNote(c *gin.Context) {	
-	var req http_requests.CreateNoteRequest
-    if err := c.ShouldBindJSON(&req); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-	tokenString := c.GetHeader("Authorization")
-	userId, err := h.deps.App.Services.AuthService.GetUserByToken(tokenString)
-	cmd := command.CreateNoteCommand{
-		UserID: userId,
-		ClientID: req.ClientID,
-		Content: req.Content,
-	}
-	createdNote, err := h.deps.App.Commands.CreateNote.Handle(cmd)
-	if err != nil {
-		c.JSON(http.StatusNotFound, err)
+func (h *NoteHandler) CreateNote(c *gin.Context) {
+	var n note.Note
+	if err := c.ShouldBindJSON(&n); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusFound, createdNote)
+	res, err := h.deps.App.Commands.CreateNote.Handle(c.Request.Context(), command.CreateNoteCommand{Note: &n})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, res)
 }
 
 // swagger:route GET /api/v1/notes/{id} notes getNote
-//
-// Get a note by ID.
-//
-// Produces:
-// - application/json
-// responses:
-// - 200: getNoteResponse
 func (h *NoteHandler) GetNote(c *gin.Context) {
-	q := query.FetchNoteById{
-		ID: c.Param("id"),
-	}
-	note, err := h.deps.App.Queries.GetNoteById.Handle(q)
+	id := c.Param("id")
+	res, err := h.deps.App.Queries.GetNoteByID.Handle(c.Request.Context(), query.FetchNoteByID{ID: id})
 	if err != nil {
-		c.JSON(http.StatusNotFound, err)
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusFound, note)
+	c.JSON(http.StatusOK, res)
 }
 
 // swagger:route PUT /api/v1/notes/{id} notes updateNote
-//
-// Update a note by ID.
-//
-// Consumes:
-// - application/json
-// Produces:
-// - application/json
 func (h *NoteHandler) UpdateNote(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "Update note - protected route"})
+	id := c.Param("id")
+	var n note.Note
+	if err := c.ShouldBindJSON(&n); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	n.ID = id
+	res, err := h.deps.App.Commands.UpdateNote.Handle(c.Request.Context(), command.UpdateNoteCommand{Note: &n})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
 }
 
 // swagger:route DELETE /api/v1/notes/{id} notes deleteNote
-//
-// Delete a note by ID.
-//
-// Produces:
-// - application/json
 func (h *NoteHandler) DeleteNote(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "Delete note - protected route"})
+	id := c.Param("id")
+	err := h.deps.App.Commands.DeleteNote.Handle(c.Request.Context(), command.DeleteNoteCommand{ID: id})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusNoContent, nil)
 }
-

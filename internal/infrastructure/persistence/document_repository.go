@@ -1,62 +1,101 @@
 package persistence
 
-import "gorm.io/gorm"
+import (
+	"github.com/Ozenkol/rbk-go-final/internal/domain/document"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/shared"
+	"gorm.io/gorm"
+)
 
 type DocumentModel struct {
-	ID       string `gorm:"primaryKey"`
-	ClientID string
-	Type     string
-	Number   string
-	IssuedBy string
-	ServiceName string
-	URL         string
-	IssuedDate           string
-	ExpirationDate       string
+	ID             string `gorm:"primaryKey"`
+	UserID         string
+	ClientID       string
+	CompanyID      string
+	Type           string
+	Number         string
+	IssuedBy       string
+	URL            string
+	IssuedDate     string
+	ExpirationDate string
 }
 
 type DocumentRepository struct {
 	db *gorm.DB
 }
 
-func NewDocumentRepository(db *gorm.DB) (*DocumentRepository, error) {
+func NewDocumentRepository(db *gorm.DB) (document.DocumentRepositoryInterface, error) {
 	if err := db.AutoMigrate(&DocumentModel{}); err != nil {
-		panic(err) // Handle error properly in production
+		return nil, err
 	}
 	return &DocumentRepository{db: db}, nil
 }
 
-func (r *DocumentRepository) Save(document *DocumentModel) (*DocumentModel, error) {
-	err := r.db.Save(document).Error
-	if err != nil {
+func (r *DocumentRepository) Create(d *document.Document) (*document.Document, error) {
+	model := toDocumentModel(d)
+	if err := r.db.Create(model).Error; err != nil {
 		return nil, err
 	}
-	return document, nil
+	return toDocumentDomain(model), nil
 }
 
-func (r *DocumentRepository) FindByID(id string) (*DocumentModel, error) {
+func (r *DocumentRepository) GetByID(id string) (*document.Document, error) {
 	var model DocumentModel
-	if err := r.db.Where("id = ?", id).First(&model).Error; err != nil {
+	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
-	return &model, nil
+	return toDocumentDomain(&model), nil
 }
 
-func (r *DocumentRepository) FindAll() ([]*DocumentModel, error) {
+func (r *DocumentRepository) Update(d *document.Document) (*document.Document, error) {
+	model := toDocumentModel(d)
+	if err := r.db.Save(model).Error; err != nil {
+		return nil, err
+	}
+	return toDocumentDomain(model), nil
+}
+
+func (r *DocumentRepository) Delete(id string) error {
+	return r.db.Delete(&DocumentModel{}, "id = ?", id).Error
+}
+
+func (r *DocumentRepository) List() ([]*document.Document, error) {
 	var models []DocumentModel
 	if err := r.db.Find(&models).Error; err != nil {
 		return nil, err
 	}
-	documents := make([]*DocumentModel, len(models))
-	for i, model := range models {
-		documents[i] = &model
+	docs := make([]*document.Document, len(models))
+	for i, m := range models {
+		docs[i] = toDocumentDomain(&m)
 	}
-	return documents, nil
+	return docs, nil
 }
 
-func (r *DocumentRepository) Update(document *DocumentModel) error {
-	return r.db.Save(document).Error
+func toDocumentModel(d *document.Document) *DocumentModel {
+	return &DocumentModel{
+		ID:             d.ID,
+		UserID:         d.UserID,
+		ClientID:       d.ClientID,
+		CompanyID:      d.CompanyID,
+		Type:           d.Type,
+		Number:         d.Number,
+		IssuedBy:       d.IssuedBy,
+		URL:            d.StorageReference.URL,
+		IssuedDate:     d.IssuedDate,
+		ExpirationDate: d.ExpirationDate,
+	}
 }
 
-func (r *DocumentRepository) Delete(id string) error {
-	return r.db.Where("id = ?", id).Delete(&DocumentModel{}).Error
+func toDocumentDomain(m *DocumentModel) *document.Document {
+	return &document.Document{
+		ID:             m.ID,
+		UserID:         m.UserID,
+		ClientID:       m.ClientID,
+		CompanyID:      m.CompanyID,
+		Type:           m.Type,
+		Number:         m.Number,
+		IssuedBy:       m.IssuedBy,
+		StorageReference: shared.StorageReference{URL: m.URL},
+		IssuedDate:     m.IssuedDate,
+		ExpirationDate: m.ExpirationDate,
+	}
 }

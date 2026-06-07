@@ -1,8 +1,9 @@
 package document
 
 type DocumentRepositoryInterface interface {
-	Create(document *Document) (Document, error)
+	Create(document *Document) (*Document, error)
 	GetByID(id string) (*Document, error)
-	Update(document *Document) error
+	Update(document *Document) (*Document, error)
 	Delete(id string) error
+	List() ([]*Document, error)
 }

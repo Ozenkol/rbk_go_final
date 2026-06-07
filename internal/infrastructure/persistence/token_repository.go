@@ -1,6 +1,7 @@
 package persistence
 
 import (
+	"context"
 	"github.com/Ozenkol/rbk-go-final/internal/application/adapters"
 	"github.com/go-redis/redis/v8"
 )
@@ -38,3 +39,10 @@ func (r *TokenRepository) DeleteUserRefreshTokens(userID string) error {
 	return r.rdb.Del(r.rdb.Context(), userID).Err()
 }
 
+func (r *TokenRepository) Save(userID string, token string) error {
+	return r.rdb.Set(context.Background(), token, userID, 0).Err()
+}
+
+func (r *TokenRepository) Get(token string) (string, error) {
+	return r.rdb.Get(context.Background(), token).Result()
+}

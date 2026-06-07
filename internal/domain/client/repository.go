@@ -1,9 +1,9 @@
 package client
 
 type ClientRepositoryInterface interface {
-	Save(client *Client) (*Client, error)
-	FindByID(id string) (*Client, error)
-	FindAll() ([]*Client, error)
-	Update(client *Client) error
+	Create(client *Client) (*Client, error)
+	GetByID(id string) (*Client, error)
+	Update(client *Client) (*Client, error)
 	Delete(id string) error
+	List() ([]*Client, error)
 }

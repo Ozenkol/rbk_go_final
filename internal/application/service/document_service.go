@@ -2,67 +2,34 @@ package service
 
 import (
 	"context"
-
 	"github.com/Ozenkol/rbk-go-final/internal/application/adapters"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/document"
 )
 
-type DocuemntService struct {
-	objectStorageProvider adapters.ObjectStorageProvider
-	documentRepo document.DocumentRepositoryInterface
+type DocumentService struct {
+	documentRepo    document.DocumentRepositoryInterface
+	storageProvider adapters.ObjectStorageProvider
 }
 
-func NewDocumentService(storageProvider adapters.ObjectStorageProvider, documentRepo document.DocumentRepositoryInterface) *DocuemntService {
-	return &DocuemntService{
-		objectStorageProvider: storageProvider,
-		documentRepo: documentRepo,
+func NewDocumentService(repo document.DocumentRepositoryInterface, storage adapters.ObjectStorageProvider) *DocumentService {
+	return &DocumentService{
+		documentRepo:    repo,
+		storageProvider: storage,
 	}
 }
 
-func (s *DocuemntService) UploadDocument(ctx context.Context, document *document.Document) (string, error) {
-	createdDocument, err := s.documentRepo.Create(document)
-	if err != nil {
-		return "", err
-	}
-	storageRef, err := s.objectStorageProvider.CreateUploadURL(ctx, createdDocument.ID)
-	if err != nil {
-		return "", err
-	}
-	return storageRef, nil
+func (s *DocumentService) CreateUploadURL(ctx context.Context, key string) (string, error) {
+	return s.storageProvider.CreateUploadURL(ctx, key)
 }
 
-func (s *DocuemntService) GetDocument(ctx context.Context, documentID string) (string, error) {
-	doc, err := s.documentRepo.GetByID(documentID)
-	if err != nil {
-		return "", err
-	}
-	downloadURL, err := s.objectStorageProvider.CreateDownloadURL(ctx, doc.ID)
-	if err != nil {
-		return "", err
-	}
-	return downloadURL, nil
+func (s *DocumentService) CreateDownloadURL(ctx context.Context, key string) (string, error) {
+	return s.storageProvider.CreateDownloadURL(ctx, key)
 }
 
-func (s *DocuemntService) UpdateDocument(ctx context.Context, document *document.Document) (string, error) {
-	err := s.documentRepo.Update(document)
-	if err != nil {
-		return "", err
-	}
-	downloadURL, err := s.objectStorageProvider.CreateDownloadURL(ctx, document.ID)
-	if err != nil {
-		return "", err
-	}
-	return downloadURL, nil
+func (s *DocumentService) SaveDocument(doc *document.Document) (*document.Document, error) {
+	return s.documentRepo.Create(doc)
 }
 
-func (s *DocuemntService) DeleteDocument(ctx context.Context, documentID string) error {
-	existingDoc, err := s.documentRepo.GetByID(documentID)
-	if err != nil {
-		return err
-	}
-	err = s.objectStorageProvider.DeleteObject(ctx, existingDoc.ID)
-	if err != nil {
-		return err
-	}
-	return s.documentRepo.Delete(documentID)
+func (s *DocumentService) UpdateDocument(doc *document.Document) (*document.Document, error) {
+	return s.documentRepo.Update(doc)
 }

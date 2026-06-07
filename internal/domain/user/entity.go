@@ -14,6 +14,7 @@ type User struct {
 	Email          string
 	CompanyID	  string
 	HashedPassword string
+	Password	   string // Temporary for command to factory flow
 	IsVerified     bool
 	CreatedAt      int64
 	UpdatedAt      int64
@@ -32,7 +33,7 @@ func NewUser(humanName shared.HumanName, email string, hashedPassword string) (U
 	if hashedPassword == "" {
 		return User{}, errors.New("HashedPassword cannot be empty")
 	}
-	id := uuid.New().String() // "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+	id := uuid.New().String()
 	return User{
 		ID:             id,
 		HumanName:      humanName,
@@ -43,7 +44,6 @@ func NewUser(humanName shared.HumanName, email string, hashedPassword string) (U
 }
 
 func isValidEmail(email string) bool {
-	// Simple regex for email validation
 	const emailRegex = `^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`
 	matched, _ := regexp.MatchString(emailRegex, email)
 	return matched
@@ -53,3 +53,6 @@ func (u *User) CheckPassword(password string) bool {
 	return u.HashedPassword == hashPassword(password)
 }
 
+func hashPassword(password string) string {
+	return password
+}

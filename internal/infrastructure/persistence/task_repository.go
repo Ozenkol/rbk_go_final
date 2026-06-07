@@ -6,8 +6,8 @@ import (
 )
 
 type TaskModel struct {
-	ID          string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	UserID    string
+	ID          string `gorm:"primaryKey"`
+	UserID      string
 	Title       string
 	Description string
 	StartTime   string
@@ -21,64 +21,71 @@ type TaskRepository struct {
 
 func NewTaskRepository(db *gorm.DB) (task.TaskRepositoryInterface, error) {
 	if err := db.AutoMigrate(&TaskModel{}); err != nil {
-		panic(err) // Handle error properly in production
+		return nil, err
 	}
 	return &TaskRepository{db: db}, nil
 }
 
-func (r *TaskRepository) Create(task *task.Task) (*task.Task, error) {
-	taskModel := toTaskModel(task)
-	err := r.db.Create(taskModel).Error
-	if err != nil {
+func (r *TaskRepository) Create(t *task.Task) (*task.Task, error) {
+	model := toTaskModel(t)
+	if err := r.db.Create(model).Error; err != nil {
 		return nil, err
 	}
-	return toTaskDomain(taskModel), nil
+	return toTaskDomain(model), nil
 }
 
 func (r *TaskRepository) GetByID(id string) (*task.Task, error) {
 	var model TaskModel
-	if err := r.db.Where("id = ?", id).First(&model).Error; err != nil {
+	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return toTaskDomain(&model), nil
 }
 
-func (r *TaskRepository) Update(task *task.Task) (*task.Task, error) {
-	taskModel := toTaskModel(task)
-	err := r.db.Save(taskModel).Error
-	if err != nil {
+func (r *TaskRepository) Update(t *task.Task) (*task.Task, error) {
+	model := toTaskModel(t)
+	if err := r.db.Save(model).Error; err != nil {
 		return nil, err
 	}
-	return toTaskDomain(taskModel), nil
+	return toTaskDomain(model), nil
 }
 
 func (r *TaskRepository) Delete(id string) error {
 	return r.db.Delete(&TaskModel{}, "id = ?", id).Error
 }
 
-func toTaskModel(task *task.Task) *TaskModel {
-	taskModel := &TaskModel{
-		UserID:    task.UserID,
-		Title:       task.Title,
-		Description: task.Description,
-		StartTime:   task.StartTime,
-		EndTime:     task.EndTime,
-		IsDone:      task.IsDone,
+func (r *TaskRepository) List() ([]*task.Task, error) {
+	var models []TaskModel
+	if err := r.db.Find(&models).Error; err != nil {
+		return nil, err
 	}
-	if task.ID != "" {
-		taskModel.ID = task.ID
+	tasks := make([]*task.Task, len(models))
+	for i, m := range models {
+		tasks[i] = toTaskDomain(&m)
 	}
-	return taskModel
+	return tasks, nil
 }
 
-func toTaskDomain(model *TaskModel) *task.Task {
+func toTaskModel(t *task.Task) *TaskModel {
+	return &TaskModel{
+		ID:          t.ID,
+		UserID:      t.UserID,
+		Title:       t.Title,
+		Description: t.Description,
+		StartTime:   t.StartTime,
+		EndTime:     t.EndTime,
+		IsDone:      t.IsDone,
+	}
+}
+
+func toTaskDomain(m *TaskModel) *task.Task {
 	return &task.Task{
-		ID:          model.ID,
-		UserID:    model.UserID,
-		Title:       model.Title,
-		Description: model.Description,
-		StartTime:   model.StartTime,
-		EndTime:     model.EndTime,
-		IsDone:      model.IsDone,
+		ID:          m.ID,
+		UserID:      m.UserID,
+		Title:       m.Title,
+		Description: m.Description,
+		StartTime:   m.StartTime,
+		EndTime:     m.EndTime,
+		IsDone:      m.IsDone,
 	}
 }

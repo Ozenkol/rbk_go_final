@@ -6,10 +6,7 @@ import (
 )
 
 type SettingModel struct {
-	ID        string `gorm:"primaryKey"`
-	CompanyID string
-	Key       string
-	Value     string
+	ID   string `gorm:"primaryKey"`
 }
 
 type SettingRepository struct {
@@ -18,45 +15,47 @@ type SettingRepository struct {
 
 func NewSettingRepository(db *gorm.DB) (setting.SettingRepositoryInterface, error) {
 	if err := db.AutoMigrate(&SettingModel{}); err != nil {
-		panic(err) // Handle error properly in production
+		return nil, err
 	}
 	return &SettingRepository{db: db}, nil
 }
 
-func (r *SettingRepository) Create(setting *setting.Setting) error {
-	return r.db.Create(toSettingModel(setting)).Error
+func (r *SettingRepository) Create(s *setting.Setting) (*setting.Setting, error) {
+	model := &SettingModel{ID: s.ID}
+	if err := r.db.Create(model).Error; err != nil {
+		return nil, err
+	}
+	return &setting.Setting{ID: model.ID}, nil
 }
 
 func (r *SettingRepository) GetByID(id string) (*setting.Setting, error) {
-	var settingModel SettingModel
-	if err := r.db.First(&settingModel, id).Error; err != nil {
+	var model SettingModel
+	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
-	return fromSettingModel(&settingModel), nil
+	return &setting.Setting{ID: model.ID}, nil
 }
 
-func (r *SettingRepository) Update(setting *setting.Setting) error {
-	return r.db.Save(toSettingModel(setting)).Error
+func (r *SettingRepository) Update(s *setting.Setting) (*setting.Setting, error) {
+	model := &SettingModel{ID: s.ID}
+	if err := r.db.Save(model).Error; err != nil {
+		return nil, err
+	}
+	return &setting.Setting{ID: model.ID}, nil
 }
 
 func (r *SettingRepository) Delete(id string) error {
-	return r.db.Delete(&SettingModel{}, id).Error
+	return r.db.Delete(&SettingModel{}, "id = ?", id).Error
 }
 
-func toSettingModel(s *setting.Setting) *SettingModel {
-	return &SettingModel{
-		ID:        s.ID,
-		CompanyID: s.CompanyID,
-		Key:       s.Key,
-		Value:     s.Value,
+func (r *SettingRepository) List() ([]*setting.Setting, error) {
+	var models []SettingModel
+	if err := r.db.Find(&models).Error; err != nil {
+		return nil, err
 	}
-}
-
-func fromSettingModel(settingModel *SettingModel) *setting.Setting {
-	return &setting.Setting{
-		ID:        settingModel.ID,
-		CompanyID: settingModel.CompanyID,
-		Key:       settingModel.Key,
-		Value:     settingModel.Value,
+	settings := make([]*setting.Setting, len(models))
+	for idx, m := range models {
+		settings[idx] = &setting.Setting{ID: m.ID}
 	}
+	return settings, nil
 }
