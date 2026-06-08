@@ -22,14 +22,21 @@ func NewFileHandler(deps *http_deps.Dependencies, logs *slog.Logger) *FileHandle
 }
 
 // swagger:route POST /api/v1/files files createFile
+// Загрузить новый файл.
+// Security:
+//   Bearer:
+// responses:
+//   201: getFileResponse
+//   400: errorResponse
 func (h *FileHandler) Create(c *gin.Context) {
 	var req http_requests.CreateFileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -37,13 +44,15 @@ func (h *FileHandler) Create(c *gin.Context) {
 
 	f := &file.File{
 		UserID:           userID,
+		CompanyID:        companyID,
 		ClientID:         req.ClientID,
-		CompanyID:        req.CompanyID,
 		StorageReference: req.StorageReference,
 		Name:             req.Name,
 	}
 
-	res, err := h.deps.App.Commands.CreateFile.Handle(c.Request.Context(), command.CreateFileCommand{File: f})
+	res, err := h.deps.App.Commands.CreateFile.Handle(c.Request.Context(), command.CreateFileCommand{
+		File: f,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -52,6 +61,12 @@ func (h *FileHandler) Create(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/files/{id} files getFile
+// Получить файл по ID.
+// Security:
+//   Bearer:
+// responses:
+//   200: getFileResponse
+//   404: errorResponse
 func (h *FileHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetFileByID.Handle(c.Request.Context(), query.FetchFileByID{ID: id})
@@ -62,7 +77,29 @@ func (h *FileHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// swagger:route GET /api/v1/files files listFiles
+// Список всех файлов.
+// Security:
+//   Bearer:
+// responses:
+//   200: []getFileResponse
+//   500: errorResponse
+func (h *FileHandler) List(c *gin.Context) {
+	res, err := h.deps.App.Queries.ListFiles.Handle(c.Request.Context(), query.FetchFileList{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 // swagger:route PUT /api/v1/files/{id} files updateFile
+// Обновить метаданные файла по ID.
+// Security:
+//   Bearer:
+// responses:
+//   200: getFileResponse
+//   400: errorResponse
 func (h *FileHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req http_requests.UpdateFileRequest
@@ -72,7 +109,7 @@ func (h *FileHandler) Update(c *gin.Context) {
 	}
 
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -81,13 +118,15 @@ func (h *FileHandler) Update(c *gin.Context) {
 	f := &file.File{
 		ID:               id,
 		UserID:           userID,
+		CompanyID:        companyID,
 		ClientID:         req.ClientID,
-		CompanyID:        req.CompanyID,
 		StorageReference: req.StorageReference,
 		Name:             req.Name,
 	}
 
-	res, err := h.deps.App.Commands.UpdateFile.Handle(c.Request.Context(), command.UpdateFileCommand{File: f})
+	res, err := h.deps.App.Commands.UpdateFile.Handle(c.Request.Context(), command.UpdateFileCommand{
+		File: f,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -96,6 +135,12 @@ func (h *FileHandler) Update(c *gin.Context) {
 }
 
 // swagger:route DELETE /api/v1/files/{id} files deleteFile
+// Удалить файл по ID.
+// Security:
+//   Bearer:
+// responses:
+//   204:
+//   500: errorResponse
 func (h *FileHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteFile.Handle(c.Request.Context(), command.DeleteFileCommand{ID: id})
@@ -104,14 +149,4 @@ func (h *FileHandler) Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusNoContent, nil)
-}
-
-// swagger:route GET /api/v1/files files listFiles
-func (h *FileHandler) List(c *gin.Context) {
-	res, err := h.deps.App.Queries.ListFiles.Handle(c.Request.Context(), query.FetchFileList{})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, res)
 }

@@ -28,7 +28,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Analytic"
+              "$ref": "#/definitions/CreateAnalyticRequest"
             }
           }
         ]
@@ -102,13 +102,13 @@
               "properties": {
                 "email": {
                   "type": "string",
-                  "default": "test@example.com",
-                  "x-go-name": "Email"
+                  "x-go-name": "Email",
+                  "example": "test@example.com"
                 },
                 "password": {
                   "type": "string",
-                  "default": "123456",
-                  "x-go-name": "Password"
+                  "x-go-name": "Password",
+                  "example": "123456"
                 }
               }
             }
@@ -137,41 +137,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "required": [
-                "first_name",
-                "middle_name",
-                "last_name",
-                "email",
-                "password"
-              ],
-              "properties": {
-                "email": {
-                  "type": "string",
-                  "default": "test@example.com",
-                  "x-go-name": "Email"
-                },
-                "first_name": {
-                  "type": "string",
-                  "default": "John",
-                  "x-go-name": "FirstName"
-                },
-                "last_name": {
-                  "type": "string",
-                  "default": "Adams",
-                  "x-go-name": "LastName"
-                },
-                "middle_name": {
-                  "type": "string",
-                  "default": "Smith",
-                  "x-go-name": "MiddleName"
-                },
-                "password": {
-                  "type": "string",
-                  "default": "123456",
-                  "x-go-name": "Password"
-                }
-              }
+              "$ref": "#/definitions/CreateUserRequest"
             }
           }
         ],
@@ -190,12 +156,27 @@
         "tags": [
           "clients"
         ],
-        "operationId": "listClients"
+        "summary": "Список всех клиентов.",
+        "operationId": "listClients",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getClientResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "clients"
         ],
+        "summary": "Создать нового клиента.",
         "operationId": "createClient",
         "parameters": [
           {
@@ -203,8 +184,21 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Client"
+              "$ref": "#/definitions/CreateClientRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getClientResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -214,6 +208,7 @@
         "tags": [
           "clients"
         ],
+        "summary": "Получить клиента по ID.",
         "operationId": "getClient",
         "parameters": [
           {
@@ -223,12 +218,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getClientResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
         "tags": [
           "clients"
         ],
+        "summary": "Обновить клиента по ID.",
         "operationId": "updateClient",
         "parameters": [
           {
@@ -238,12 +247,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getClientResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
         "tags": [
           "clients"
         ],
+        "summary": "Удалить клиента по ID.",
         "operationId": "deleteClient",
         "parameters": [
           {
@@ -252,6 +275,19 @@
             "name": "id",
             "in": "path",
             "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -274,7 +310,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Communication"
+              "$ref": "#/definitions/CreateCommunicationRequest"
             }
           }
         ]
@@ -345,7 +381,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Company"
+              "$ref": "#/definitions/CreateCompanyRequest"
             }
           }
         ]
@@ -403,12 +439,27 @@
         "tags": [
           "contracts"
         ],
-        "operationId": "listContracts"
+        "summary": "Список всех контрактов.",
+        "operationId": "listContracts",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getContractResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "contracts"
         ],
+        "summary": "Создать новый контракт.",
         "operationId": "createContract",
         "parameters": [
           {
@@ -416,8 +467,21 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Contract"
+              "$ref": "#/definitions/CreateContractRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getContractResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -427,6 +491,7 @@
         "tags": [
           "contracts"
         ],
+        "summary": "Получить контракт по ID.",
         "operationId": "getContract",
         "parameters": [
           {
@@ -436,12 +501,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getContractResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
         "tags": [
           "contracts"
         ],
+        "summary": "Обновить контракт по ID.",
         "operationId": "updateContract",
         "parameters": [
           {
@@ -451,12 +530,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getContractResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
         "tags": [
           "contracts"
         ],
+        "summary": "Удалить контракт по ID.",
         "operationId": "deleteContract",
         "parameters": [
           {
@@ -466,10 +559,43 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       }
     },
     "/api/v1/documents": {
+      "get": {
+        "tags": [
+          "documents"
+        ],
+        "summary": "List all documents.",
+        "operationId": "listDocuments",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getDocumentResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
       "post": {
         "tags": [
           "documents"
@@ -482,7 +608,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Document"
+              "$ref": "#/definitions/CreateDocumentRequest"
             }
           }
         ],
@@ -595,12 +721,27 @@
         "tags": [
           "files"
         ],
-        "operationId": "listFiles"
+        "summary": "Список всех файлов.",
+        "operationId": "listFiles",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getFileResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "files"
         ],
+        "summary": "Загрузить новый файл.",
         "operationId": "createFile",
         "parameters": [
           {
@@ -608,8 +749,21 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/File"
+              "$ref": "#/definitions/CreateFileRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getFileResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -619,6 +773,7 @@
         "tags": [
           "files"
         ],
+        "summary": "Получить файл по ID.",
         "operationId": "getFile",
         "parameters": [
           {
@@ -628,12 +783,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getFileResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
         "tags": [
           "files"
         ],
+        "summary": "Обновить метаданные файла по ID.",
         "operationId": "updateFile",
         "parameters": [
           {
@@ -643,12 +812,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getFileResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
         "tags": [
           "files"
         ],
+        "summary": "Удалить файл по ID.",
         "operationId": "deleteFile",
         "parameters": [
           {
@@ -658,6 +841,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       }
     },
@@ -666,12 +862,27 @@
         "tags": [
           "invoices"
         ],
-        "operationId": "listInvoices"
+        "summary": "Список всех счетов.",
+        "operationId": "listInvoices",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getInvoiceResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "invoices"
         ],
+        "summary": "Создать новый счет.",
         "operationId": "createInvoice",
         "parameters": [
           {
@@ -679,8 +890,21 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Invoice"
+              "$ref": "#/definitions/CreateInvoiceRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getInvoiceResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -690,6 +914,7 @@
         "tags": [
           "invoices"
         ],
+        "summary": "Получить счет по ID.",
         "operationId": "getInvoice",
         "parameters": [
           {
@@ -699,12 +924,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getInvoiceResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
         "tags": [
           "invoices"
         ],
+        "summary": "Обновить счет по ID.",
         "operationId": "updateInvoice",
         "parameters": [
           {
@@ -714,12 +953,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getInvoiceResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
         "tags": [
           "invoices"
         ],
+        "summary": "Удалить счет по ID.",
         "operationId": "deleteInvoice",
         "parameters": [
           {
@@ -729,6 +982,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       }
     },
@@ -737,12 +1003,27 @@
         "tags": [
           "meetings"
         ],
-        "operationId": "listMeetings"
+        "summary": "Список всех встреч.",
+        "operationId": "listMeetings",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getMeetingResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "meetings"
         ],
+        "summary": "Создать новую встречу.",
         "operationId": "createMeeting",
         "parameters": [
           {
@@ -750,8 +1031,21 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Meeting"
+              "$ref": "#/definitions/CreateMeetingRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getMeetingResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -761,6 +1055,7 @@
         "tags": [
           "meetings"
         ],
+        "summary": "Получить встречу по ID.",
         "operationId": "getMeeting",
         "parameters": [
           {
@@ -770,12 +1065,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getMeetingResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
         "tags": [
           "meetings"
         ],
+        "summary": "Обновить встречу по ID.",
         "operationId": "updateMeeting",
         "parameters": [
           {
@@ -785,12 +1094,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getMeetingResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
         "tags": [
           "meetings"
         ],
+        "summary": "Удалить встречу по ID.",
         "operationId": "deleteMeeting",
         "parameters": [
           {
@@ -799,6 +1122,19 @@
             "name": "id",
             "in": "path",
             "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -816,7 +1152,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Note"
+              "$ref": "#/definitions/CreateNoteRequest"
             }
           }
         ],
@@ -942,7 +1278,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Notification"
+              "$ref": "#/definitions/CreateNotificationRequest"
             }
           }
         ]
@@ -1007,7 +1343,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Offer"
+              "$ref": "#/definitions/CreateOfferRequest"
             }
           }
         ]
@@ -1065,12 +1401,27 @@
         "tags": [
           "products"
         ],
-        "operationId": "listProducts"
+        "summary": "Список всех продуктов.",
+        "operationId": "listProducts",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getProductResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "products"
         ],
+        "summary": "Создать новый продукт.",
         "operationId": "createProduct",
         "parameters": [
           {
@@ -1078,8 +1429,21 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Product"
+              "$ref": "#/definitions/CreateProductRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getProductResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -1089,6 +1453,7 @@
         "tags": [
           "products"
         ],
+        "summary": "Получить продукт по ID.",
         "operationId": "getProduct",
         "parameters": [
           {
@@ -1098,12 +1463,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getProductResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
         "tags": [
           "products"
         ],
+        "summary": "Обновить продукт по ID.",
         "operationId": "updateProduct",
         "parameters": [
           {
@@ -1113,12 +1492,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getProductResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
         "tags": [
           "products"
         ],
+        "summary": "Удалить продукт по ID.",
         "operationId": "deleteProduct",
         "parameters": [
           {
@@ -1128,6 +1521,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       }
     },
@@ -1136,12 +1542,27 @@
         "tags": [
           "settings"
         ],
-        "operationId": "listSettings"
+        "summary": "Список всех настроек.",
+        "operationId": "listSettings",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getSettingResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "settings"
         ],
+        "summary": "Создать новую настройку.",
         "operationId": "createSetting",
         "parameters": [
           {
@@ -1149,8 +1570,21 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Setting"
+              "$ref": "#/definitions/CreateSettingRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getSettingResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -1160,6 +1594,7 @@
         "tags": [
           "settings"
         ],
+        "summary": "Получить настройку по ID.",
         "operationId": "getSetting",
         "parameters": [
           {
@@ -1169,12 +1604,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getSettingResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
         "tags": [
           "settings"
         ],
+        "summary": "Обновить настройку по ID.",
         "operationId": "updateSetting",
         "parameters": [
           {
@@ -1184,12 +1633,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getSettingResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
         "tags": [
           "settings"
         ],
+        "summary": "Удалить настройку по ID.",
         "operationId": "deleteSetting",
         "parameters": [
           {
@@ -1199,6 +1662,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       }
     },
@@ -1207,12 +1683,27 @@
         "tags": [
           "tags"
         ],
-        "operationId": "listTags"
+        "summary": "Список всех тегов.",
+        "operationId": "listTags",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getTagResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "tags"
         ],
+        "summary": "Создать новый тег.",
         "operationId": "createTag",
         "parameters": [
           {
@@ -1220,8 +1711,21 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Tag"
+              "$ref": "#/definitions/CreateTagRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getTagResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -1231,6 +1735,7 @@
         "tags": [
           "tags"
         ],
+        "summary": "Получить тег по ID.",
         "operationId": "getTag",
         "parameters": [
           {
@@ -1240,12 +1745,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getTagResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
         "tags": [
           "tags"
         ],
+        "summary": "Обновить тег по ID.",
         "operationId": "updateTag",
         "parameters": [
           {
@@ -1255,12 +1774,26 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getTagResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
         "tags": [
           "tags"
         ],
+        "summary": "Удалить тег по ID.",
         "operationId": "deleteTag",
         "parameters": [
           {
@@ -1270,6 +1803,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       }
     },
@@ -1278,7 +1824,7 @@
         "tags": [
           "tasks"
         ],
-        "summary": "Create a new task.",
+        "summary": "Создать новую задачу.",
         "operationId": "createTask",
         "parameters": [
           {
@@ -1286,7 +1832,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Task"
+              "$ref": "#/definitions/CreateTaskRequest"
             }
           }
         ],
@@ -1310,7 +1856,7 @@
         "tags": [
           "tasks"
         ],
-        "summary": "Get task by ID.",
+        "summary": "Получить задачу по ID.",
         "operationId": "getTask",
         "parameters": [
           {
@@ -1339,7 +1885,7 @@
         "tags": [
           "tasks"
         ],
-        "summary": "Update a task.",
+        "summary": "Обновить задачу.",
         "operationId": "updateTask",
         "parameters": [
           {
@@ -1354,7 +1900,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Task"
+              "$ref": "#/definitions/UpdateTaskRequest"
             }
           }
         ],
@@ -1376,7 +1922,7 @@
         "tags": [
           "tasks"
         ],
-        "summary": "Delete a task.",
+        "summary": "Удалить задачу.",
         "operationId": "deleteTask",
         "parameters": [
           {
@@ -1415,29 +1961,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "type": "string",
-                  "x-go-name": "Email"
-                },
-                "first_name": {
-                  "type": "string",
-                  "x-go-name": "FirstName"
-                },
-                "last_name": {
-                  "type": "string",
-                  "x-go-name": "LastName"
-                },
-                "middle_name": {
-                  "type": "string",
-                  "x-go-name": "MiddleName"
-                },
-                "password": {
-                  "type": "string",
-                  "x-go-name": "Password"
-                }
-              }
+              "$ref": "#/definitions/CreateUserRequest"
             }
           }
         ]
@@ -1524,20 +2048,16 @@
     "Client": {
       "type": "object",
       "properties": {
-        "CompanyID": {
-          "type": "string"
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
         },
-        "ID": {
-          "type": "string"
+        "is_active": {
+          "type": "boolean",
+          "x-go-name": "IsActive"
         },
-        "IsActive": {
-          "type": "boolean"
-        },
-        "Person": {
+        "person": {
           "$ref": "#/definitions/Person"
-        },
-        "UserID": {
-          "type": "string"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/client"
@@ -1592,6 +2112,352 @@
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/contract"
+    },
+    "CreateAnalyticRequest": {
+      "description": "CreateAnalyticRequest represents the request body for creating an analytic record",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "data": {
+          "description": "Analytic data",
+          "x-go-name": "Data"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateClientRequest": {
+      "description": "CreateClientRequest represents the request body for creating a client",
+      "type": "object",
+      "properties": {
+        "is_active": {
+          "description": "Client active status",
+          "type": "boolean",
+          "x-go-name": "IsActive",
+          "example": true
+        },
+        "person": {
+          "$ref": "#/definitions/Person"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateCommunicationRequest": {
+      "description": "CreateCommunicationRequest represents the request body for creating a communication record",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateCompanyRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateContractRequest": {
+      "description": "CreateContractRequest represents the request body for creating a contract",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "content": {
+          "description": "Contract content",
+          "type": "string",
+          "x-go-name": "Content",
+          "example": "Standard service agreement"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateDocumentRequest": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "x-go-name": "ClientID"
+        },
+        "company_id": {
+          "type": "string",
+          "x-go-name": "CompanyID"
+        },
+        "expiration_date": {
+          "type": "string",
+          "x-go-name": "ExpirationDate"
+        },
+        "issued_by": {
+          "type": "string",
+          "x-go-name": "IssuedBy"
+        },
+        "issued_date": {
+          "type": "string",
+          "x-go-name": "IssuedDate"
+        },
+        "number": {
+          "type": "string",
+          "x-go-name": "Number"
+        },
+        "type": {
+          "type": "string",
+          "x-go-name": "Type"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateFileRequest": {
+      "description": "CreateFileRequest represents the request body for uploading a file",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "name": {
+          "description": "File name",
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "contract.pdf"
+        },
+        "storage_reference": {
+          "description": "Storage reference path",
+          "type": "string",
+          "x-go-name": "StorageReference",
+          "example": "uploads/2023/10/file.pdf"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateInvoiceRequest": {
+      "description": "CreateInvoiceRequest represents the request body for creating an invoice",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "document_id": {
+          "description": "Document ID",
+          "type": "string",
+          "x-go-name": "DocumentID",
+          "example": "550e8400-e29b-41d4-a716-446655440001"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateMeetingRequest": {
+      "description": "CreateMeetingRequest represents the request body for creating a meeting",
+      "type": "object",
+      "properties": {
+        "attendees": {
+          "description": "List of attendees",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Attendee"
+          },
+          "x-go-name": "Attendees"
+        },
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "meeting_provider": {
+          "$ref": "#/definitions/MeetingProvider"
+        },
+        "time_slot": {
+          "$ref": "#/definitions/TimeSlot"
+        },
+        "topic": {
+          "description": "Meeting topic",
+          "type": "string",
+          "x-go-name": "Topic",
+          "example": "Project kickoff"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateNoteRequest": {
+      "type": "object",
+      "properties": {
+        "ClientID": {
+          "type": "string"
+        },
+        "Content": {
+          "type": "string"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateNotificationRequest": {
+      "description": "CreateNotificationRequest represents the request body for creating a notification",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "message": {
+          "description": "Notification message",
+          "type": "string",
+          "x-go-name": "Message",
+          "example": "Your subscription is about to expire"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateOfferRequest": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "x-go-name": "ClientID"
+        },
+        "company_id": {
+          "type": "string",
+          "x-go-name": "CompanyID"
+        },
+        "document_id": {
+          "type": "string",
+          "x-go-name": "DocumentID"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateProductRequest": {
+      "description": "CreateProductRequest represents the request body for creating a product",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Product description",
+          "type": "string",
+          "x-go-name": "Description",
+          "example": "Access to all premium features"
+        },
+        "name": {
+          "description": "Product name",
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "Premium Subscription"
+        },
+        "price": {
+          "$ref": "#/definitions/Money"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/StorageReference"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateSettingRequest": {
+      "description": "CreateSettingRequest represents the request body for creating a setting",
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "Setting key",
+          "type": "string",
+          "x-go-name": "Key",
+          "example": "maintenance_mode"
+        },
+        "value": {
+          "description": "Setting value",
+          "type": "string",
+          "x-go-name": "Value",
+          "example": "false"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateTagRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateTaskRequest": {
+      "description": "CreateTaskRequest represents the request body for creating a task",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Task description",
+          "type": "string",
+          "x-go-name": "Description",
+          "example": "Prepare and send offer to client"
+        },
+        "end_time": {
+          "description": "Task end time",
+          "type": "string",
+          "x-go-name": "EndTime",
+          "example": "2023-10-27T11:00:00Z"
+        },
+        "start_time": {
+          "description": "Task start time",
+          "type": "string",
+          "x-go-name": "StartTime",
+          "example": "2023-10-27T10:00:00Z"
+        },
+        "title": {
+          "description": "Task title",
+          "type": "string",
+          "x-go-name": "Title",
+          "example": "Do offer"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "CreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "first_name": {
+          "type": "string",
+          "x-go-name": "FirstName"
+        },
+        "last_name": {
+          "type": "string",
+          "x-go-name": "LastName"
+        },
+        "middle_name": {
+          "type": "string",
+          "x-go-name": "MiddleName"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
     },
     "Currency": {
       "type": "object",
@@ -1787,20 +2653,17 @@
     "Note": {
       "type": "object",
       "properties": {
-        "ClientID": {
-          "type": "string"
+        "client_id": {
+          "type": "string",
+          "x-go-name": "ClientID"
         },
-        "CompanyID": {
-          "type": "string"
+        "content": {
+          "type": "string",
+          "x-go-name": "Content"
         },
-        "Content": {
-          "type": "string"
-        },
-        "ID": {
-          "type": "string"
-        },
-        "UserID": {
-          "type": "string"
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/note"
@@ -1962,14 +2825,13 @@
     "Tag": {
       "type": "object",
       "properties": {
-        "ID": {
-          "type": "string"
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
         },
-        "Name": {
-          "type": "string"
-        },
-        "UserID": {
-          "type": "string"
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/tag"
@@ -1977,29 +2839,29 @@
     "Task": {
       "type": "object",
       "properties": {
-        "CompanyID": {
-          "type": "string"
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
         },
-        "Description": {
-          "type": "string"
+        "end_time": {
+          "type": "string",
+          "x-go-name": "EndTime"
         },
-        "EndTime": {
-          "type": "string"
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
         },
-        "ID": {
-          "type": "string"
+        "is_done": {
+          "type": "boolean",
+          "x-go-name": "IsDone"
         },
-        "IsDone": {
-          "type": "boolean"
+        "start_time": {
+          "type": "string",
+          "x-go-name": "StartTime"
         },
-        "StartTime": {
-          "type": "string"
-        },
-        "Title": {
-          "type": "string"
-        },
-        "UserID": {
-          "type": "string"
+        "title": {
+          "type": "string",
+          "x-go-name": "Title"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/task"
@@ -2030,6 +2892,248 @@
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/application/service"
+    },
+    "UpdateAnalyticRequest": {
+      "description": "UpdateAnalyticRequest represents the request body for updating an analytic record",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "data": {
+          "description": "Analytic data",
+          "x-go-name": "Data"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateClientRequest": {
+      "description": "UpdateClientRequest represents the request body for updating a client",
+      "type": "object",
+      "properties": {
+        "is_active": {
+          "description": "Client active status",
+          "type": "boolean",
+          "x-go-name": "IsActive",
+          "example": true
+        },
+        "person": {
+          "$ref": "#/definitions/Person"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateCommunicationRequest": {
+      "description": "UpdateCommunicationRequest represents the request body for updating a communication record",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateContractRequest": {
+      "description": "UpdateContractRequest represents the request body for updating a contract",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "content": {
+          "description": "Contract content",
+          "type": "string",
+          "x-go-name": "Content",
+          "example": "Updated service agreement"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateFileRequest": {
+      "description": "UpdateFileRequest represents the request body for updating file metadata",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "name": {
+          "description": "File name",
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "contract_v2.pdf"
+        },
+        "storage_reference": {
+          "description": "Storage reference path",
+          "type": "string",
+          "x-go-name": "StorageReference",
+          "example": "uploads/2023/10/file.pdf"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateInvoiceRequest": {
+      "description": "UpdateInvoiceRequest represents the request body for updating an invoice",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "document_id": {
+          "description": "Document ID",
+          "type": "string",
+          "x-go-name": "DocumentID",
+          "example": "550e8400-e29b-41d4-a716-446655440001"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateMeetingRequest": {
+      "description": "UpdateMeetingRequest represents the request body for updating a meeting",
+      "type": "object",
+      "properties": {
+        "attendees": {
+          "description": "List of attendees",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Attendee"
+          },
+          "x-go-name": "Attendees"
+        },
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "meeting_provider": {
+          "$ref": "#/definitions/MeetingProvider"
+        },
+        "time_slot": {
+          "$ref": "#/definitions/TimeSlot"
+        },
+        "topic": {
+          "description": "Meeting topic",
+          "type": "string",
+          "x-go-name": "Topic",
+          "example": "Project kickoff"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateNotificationRequest": {
+      "description": "UpdateNotificationRequest represents the request body for updating a notification",
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "description": "Client ID",
+          "type": "string",
+          "x-go-name": "ClientID",
+          "example": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "message": {
+          "description": "Notification message",
+          "type": "string",
+          "x-go-name": "Message",
+          "example": "Your subscription has expired"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateProductRequest": {
+      "description": "UpdateProductRequest represents the request body for updating a product",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Product description",
+          "type": "string",
+          "x-go-name": "Description",
+          "example": "Access to all premium features"
+        },
+        "name": {
+          "description": "Product name",
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "Premium Subscription"
+        },
+        "price": {
+          "$ref": "#/definitions/Money"
+        },
+        "thumbnail": {
+          "$ref": "#/definitions/StorageReference"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateSettingRequest": {
+      "description": "UpdateSettingRequest represents the request body for updating a setting",
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "Setting key",
+          "type": "string",
+          "x-go-name": "Key",
+          "example": "maintenance_mode"
+        },
+        "value": {
+          "description": "Setting value",
+          "type": "string",
+          "x-go-name": "Value",
+          "example": "true"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+    },
+    "UpdateTaskRequest": {
+      "description": "UpdateTaskRequest represents the request body for updating a task",
+      "type": "object",
+      "properties": {
+        "description": {
+          "description": "Task description",
+          "type": "string",
+          "x-go-name": "Description",
+          "example": "Prepare and send offer to client"
+        },
+        "end_time": {
+          "description": "Task end time",
+          "type": "string",
+          "x-go-name": "EndTime",
+          "example": "2023-10-27T11:00:00Z"
+        },
+        "is_done": {
+          "description": "Task completion status",
+          "type": "boolean",
+          "x-go-name": "IsDone",
+          "example": true
+        },
+        "start_time": {
+          "description": "Task start time",
+          "type": "string",
+          "x-go-name": "StartTime",
+          "example": "2023-10-27T10:00:00Z"
+        },
+        "title": {
+          "description": "Task title",
+          "type": "string",
+          "x-go-name": "Title",
+          "example": "Do offer"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
     }
   },
   "responses": {

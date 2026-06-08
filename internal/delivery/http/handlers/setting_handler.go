@@ -22,14 +22,21 @@ func NewSettingHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Setting
 }
 
 // swagger:route POST /api/v1/settings settings createSetting
+// Создать новую настройку.
+// Security:
+//   Bearer:
+// responses:
+//   201: getSettingResponse
+//   400: errorResponse
 func (h *SettingHandler) Create(c *gin.Context) {
 	var req http_requests.CreateSettingRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -37,12 +44,14 @@ func (h *SettingHandler) Create(c *gin.Context) {
 
 	s := &setting.Setting{
 		UserID:    userID,
-		CompanyID: req.CompanyID,
+		CompanyID: companyID,
 		Key:       req.Key,
 		Value:     req.Value,
 	}
 
-	res, err := h.deps.App.Commands.CreateSetting.Handle(c.Request.Context(), command.CreateSettingCommand{Setting: s})
+	res, err := h.deps.App.Commands.CreateSetting.Handle(c.Request.Context(), command.CreateSettingCommand{
+		Setting: s,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -51,6 +60,12 @@ func (h *SettingHandler) Create(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/settings/{id} settings getSetting
+// Получить настройку по ID.
+// Security:
+//   Bearer:
+// responses:
+//   200: getSettingResponse
+//   404: errorResponse
 func (h *SettingHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetSettingByID.Handle(c.Request.Context(), query.FetchSettingByID{ID: id})
@@ -61,7 +76,29 @@ func (h *SettingHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// swagger:route GET /api/v1/settings settings listSettings
+// Список всех настроек.
+// Security:
+//   Bearer:
+// responses:
+//   200: []getSettingResponse
+//   500: errorResponse
+func (h *SettingHandler) List(c *gin.Context) {
+	res, err := h.deps.App.Queries.ListSettings.Handle(c.Request.Context(), query.FetchSettingList{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 // swagger:route PUT /api/v1/settings/{id} settings updateSetting
+// Обновить настройку по ID.
+// Security:
+//   Bearer:
+// responses:
+//   200: getSettingResponse
+//   400: errorResponse
 func (h *SettingHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req http_requests.UpdateSettingRequest
@@ -71,7 +108,7 @@ func (h *SettingHandler) Update(c *gin.Context) {
 	}
 
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -80,12 +117,14 @@ func (h *SettingHandler) Update(c *gin.Context) {
 	s := &setting.Setting{
 		ID:        id,
 		UserID:    userID,
-		CompanyID: req.CompanyID,
+		CompanyID: companyID,
 		Key:       req.Key,
 		Value:     req.Value,
 	}
 
-	res, err := h.deps.App.Commands.UpdateSetting.Handle(c.Request.Context(), command.UpdateSettingCommand{Setting: s})
+	res, err := h.deps.App.Commands.UpdateSetting.Handle(c.Request.Context(), command.UpdateSettingCommand{
+		Setting: s,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -94,6 +133,12 @@ func (h *SettingHandler) Update(c *gin.Context) {
 }
 
 // swagger:route DELETE /api/v1/settings/{id} settings deleteSetting
+// Удалить настройку по ID.
+// Security:
+//   Bearer:
+// responses:
+//   204:
+//   500: errorResponse
 func (h *SettingHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteSetting.Handle(c.Request.Context(), command.DeleteSettingCommand{ID: id})
@@ -102,14 +147,4 @@ func (h *SettingHandler) Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusNoContent, nil)
-}
-
-// swagger:route GET /api/v1/settings settings listSettings
-func (h *SettingHandler) List(c *gin.Context) {
-	res, err := h.deps.App.Queries.ListSettings.Handle(c.Request.Context(), query.FetchSettingList{})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, res)
 }

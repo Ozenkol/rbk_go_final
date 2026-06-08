@@ -22,7 +22,7 @@ func NewTaskHandler(deps *http_deps.Dependencies, logs *slog.Logger) *TaskHandle
 }
 
 // swagger:route POST /api/v1/tasks tasks createTask
-// Create a new task.
+// Создать новую задачу.
 // Security:
 //   Bearer:
 // responses:
@@ -35,7 +35,7 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 		return
 	}
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -43,6 +43,7 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 
 	t := &task.Task{
 		UserID:      userID,
+		CompanyID:   companyID,
 		Title:       req.Title,
 		Description: req.Description,
 		StartTime:   req.StartTime,
@@ -60,7 +61,7 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/tasks/{id} tasks getTask
-// Get task by ID.
+// Получить задачу по ID.
 // security:
 //   Bearer:
 // responses:
@@ -77,7 +78,7 @@ func (h *TaskHandler) GetByID(c *gin.Context) {
 }
 
 // swagger:route PUT /api/v1/tasks/{id} tasks updateTask
-// Update a task.
+// Обновить задачу.
 // security:
 //   Bearer:
 // responses:
@@ -91,15 +92,16 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		return
 	}
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
 	t := &task.Task{
-		ID:     id,
-		UserID: userID,
+		ID:        id,
+		UserID:    userID,
+		CompanyID: companyID,
 	}
 	if req.Title != nil {
 		t.Title = *req.Title
@@ -128,7 +130,7 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 }
 
 // swagger:route DELETE /api/v1/tasks/{id} tasks deleteTask
-// Delete a task.
+// Удалить задачу.
 // security:
 //   Bearer:
 // responses:
