@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/contract"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/contract"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,28 @@ func NewContractHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Contra
 
 // swagger:route POST /api/v1/contracts contracts createContract
 func (h *ContractHandler) Create(c *gin.Context) {
-	var cont contract.Contract
-	if err := c.ShouldBindJSON(&cont); err != nil {
+	var req http_requests.CreateContractRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateContract.Handle(c.Request.Context(), command.CreateContractCommand{Contract: &cont})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	cont := &contract.Contract{
+		UserID:    userID,
+		ClientID:  req.ClientID,
+		CompanyID: req.CompanyID,
+		Content:   req.Content,
+	}
+
+	res, err := h.deps.App.Commands.CreateContract.Handle(c.Request.Context(), command.CreateContractCommand{
+		Contract: cont,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +66,30 @@ func (h *ContractHandler) GetByID(c *gin.Context) {
 // swagger:route PUT /api/v1/contracts/{id} contracts updateContract
 func (h *ContractHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var cont contract.Contract
-	if err := c.ShouldBindJSON(&cont); err != nil {
+	var req http_requests.UpdateContractRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	cont.ID = id
-	res, err := h.deps.App.Commands.UpdateContract.Handle(c.Request.Context(), command.UpdateContractCommand{Contract: &cont})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	cont := &contract.Contract{
+		ID:        id,
+		UserID:    userID,
+		ClientID:  req.ClientID,
+		CompanyID: req.CompanyID,
+		Content:   req.Content,
+	}
+
+	res, err := h.deps.App.Commands.UpdateContract.Handle(c.Request.Context(), command.UpdateContractCommand{
+		Contract: cont,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

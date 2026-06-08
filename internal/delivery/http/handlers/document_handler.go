@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/document"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/document"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,12 +29,33 @@ func NewDocumentHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Docume
 //   201: getDocumentResponse
 //   400: errorResponse
 func (h *DocumentHandler) CreateDocument(c *gin.Context) {
-	var d document.Document
-	if err := c.ShouldBindJSON(&d); err != nil {
+	var req http_requests.CreateDocumentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateDocument.Handle(c.Request.Context(), command.CreateDocumentCommand{Document: &d})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	d := &document.Document{
+		UserID:         userID,
+		ClientID:       req.ClientID,
+		CompanyID:      req.CompanyID,
+		Type:           req.Type,
+		Number:         req.Number,
+		IssuedBy:       req.IssuedBy,
+		IssuedDate:     req.IssuedDate,
+		ExpirationDate: req.ExpirationDate,
+	}
+
+	res, err := h.deps.App.Commands.CreateDocument.Handle(c.Request.Context(), command.CreateDocumentCommand{
+		Document: d,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -67,13 +89,34 @@ func (h *DocumentHandler) GetDocument(c *gin.Context) {
 //   400: errorResponse
 func (h *DocumentHandler) UpdateDocument(c *gin.Context) {
 	id := c.Param("id")
-	var d document.Document
-	if err := c.ShouldBindJSON(&d); err != nil {
+	var req http_requests.UpdateDocumentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	d.ID = id
-	res, err := h.deps.App.Commands.UpdateDocument.Handle(c.Request.Context(), command.UpdateDocumentCommand{Document: &d})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	d := &document.Document{
+		ID:             id,
+		UserID:         userID,
+		ClientID:       req.ClientID,
+		CompanyID:      req.CompanyID,
+		Type:           req.Type,
+		Number:         req.Number,
+		IssuedBy:       req.IssuedBy,
+		IssuedDate:     req.IssuedDate,
+		ExpirationDate: req.ExpirationDate,
+	}
+
+	res, err := h.deps.App.Commands.UpdateDocument.Handle(c.Request.Context(), command.UpdateDocumentCommand{
+		Document: d,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

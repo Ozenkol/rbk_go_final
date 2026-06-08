@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/Ozenkol/rbk-go-final/internal/application/adapters"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/document"
 )
 
@@ -10,15 +11,33 @@ type CreateDocumentCommand struct {
 }
 
 type CreateDocumentHandler struct {
-	repo document.DocumentRepositoryInterface
+	repo            document.DocumentRepositoryInterface
+	storageProvider adapters.ObjectStorageProvider
 }
 
-func NewCreateDocumentHandler(repo document.DocumentRepositoryInterface) *CreateDocumentHandler {
-	return &CreateDocumentHandler{repo: repo}
+func NewCreateDocumentHandler(
+	repo document.DocumentRepositoryInterface,
+	storageProvider adapters.ObjectStorageProvider,
+) *CreateDocumentHandler {
+	return &CreateDocumentHandler{
+		repo:            repo,
+		storageProvider: storageProvider,
+	}
 }
 
 func (h *CreateDocumentHandler) Handle(ctx context.Context, cmd CreateDocumentCommand) (*document.Document, error) {
-	return h.repo.Create(cmd.Document)
+	doc, err := h.repo.Create(cmd.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	url, err := h.storageProvider.CreateDownloadURL(ctx, doc.ID)
+	if err == nil {
+		doc.StorageReference.URL = url
+		return h.repo.Update(doc)
+	}
+
+	return doc, nil
 }
 
 type UpdateDocumentCommand struct {
@@ -29,8 +48,12 @@ type UpdateDocumentHandler struct {
 	repo document.DocumentRepositoryInterface
 }
 
-func NewUpdateDocumentHandler(repo document.DocumentRepositoryInterface) *UpdateDocumentHandler {
-	return &UpdateDocumentHandler{repo: repo}
+func NewUpdateDocumentHandler(
+	repo document.DocumentRepositoryInterface,
+) *UpdateDocumentHandler {
+	return &UpdateDocumentHandler{
+		repo: repo,
+	}
 }
 
 func (h *UpdateDocumentHandler) Handle(ctx context.Context, cmd UpdateDocumentCommand) (*document.Document, error) {

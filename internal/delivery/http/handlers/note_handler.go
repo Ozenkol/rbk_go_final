@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/note"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/note"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,12 +29,27 @@ func NewNoteHandler(deps *http_deps.Dependencies, logs *slog.Logger) *NoteHandle
 //   201: getNoteResponse
 //   400: errorResponse
 func (h *NoteHandler) CreateNote(c *gin.Context) {
-	var n note.Note
-	if err := c.ShouldBindJSON(&n); err != nil {
+	var req http_requests.CreateNoteRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateNote.Handle(c.Request.Context(), command.CreateNoteCommand{Note: &n})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	n := &note.Note{
+		UserID:   userID,
+		ClientID: req.ClientID,
+		Content:  req.Content,
+	}
+
+	res, err := h.deps.App.Commands.CreateNote.Handle(c.Request.Context(), command.CreateNoteCommand{
+		Note: n,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -67,13 +83,29 @@ func (h *NoteHandler) GetNote(c *gin.Context) {
 //   400: errorResponse
 func (h *NoteHandler) UpdateNote(c *gin.Context) {
 	id := c.Param("id")
-	var n note.Note
-	if err := c.ShouldBindJSON(&n); err != nil {
+	var req http_requests.CreateNoteRequest // Reusing CreateNoteRequest as fields are same
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	n.ID = id
-	res, err := h.deps.App.Commands.UpdateNote.Handle(c.Request.Context(), command.UpdateNoteCommand{Note: &n})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	n := &note.Note{
+		ID:       id,
+		UserID:   userID,
+		ClientID: req.ClientID,
+		Content:  req.Content,
+	}
+
+	res, err := h.deps.App.Commands.UpdateNote.Handle(c.Request.Context(), command.UpdateNoteCommand{
+		Note: n,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

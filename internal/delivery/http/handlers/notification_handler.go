@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/notification"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/notification"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,25 @@ func NewNotificationHandler(deps *http_deps.Dependencies, logs *slog.Logger) *No
 
 // swagger:route POST /api/v1/notifications notifications createNotification
 func (h *NotificationHandler) Create(c *gin.Context) {
-	var n notification.Notification
-	if err := c.ShouldBindJSON(&n); err != nil {
+	var req http_requests.CreateNotificationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateNotification.Handle(c.Request.Context(), command.CreateNotificationCommand{Notification: &n})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	n := &notification.Notification{
+		UserID:   userID,
+		ClientID: req.ClientID,
+		Message:  req.Message,
+	}
+
+	res, err := h.deps.App.Commands.CreateNotification.Handle(c.Request.Context(), command.CreateNotificationCommand{Notification: n})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +63,27 @@ func (h *NotificationHandler) GetByID(c *gin.Context) {
 // swagger:route PUT /api/v1/notifications/{id} notifications updateNotification
 func (h *NotificationHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var n notification.Notification
-	if err := c.ShouldBindJSON(&n); err != nil {
+	var req http_requests.UpdateNotificationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	n.ID = id
-	res, err := h.deps.App.Commands.UpdateNotification.Handle(c.Request.Context(), command.UpdateNotificationCommand{Notification: &n})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	n := &notification.Notification{
+		ID:       id,
+		UserID:   userID,
+		ClientID: req.ClientID,
+		Message:  req.Message,
+	}
+
+	res, err := h.deps.App.Commands.UpdateNotification.Handle(c.Request.Context(), command.UpdateNotificationCommand{Notification: n})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

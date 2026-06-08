@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/file"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/file"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,27 @@ func NewFileHandler(deps *http_deps.Dependencies, logs *slog.Logger) *FileHandle
 
 // swagger:route POST /api/v1/files files createFile
 func (h *FileHandler) Create(c *gin.Context) {
-	var f file.File
-	if err := c.ShouldBindJSON(&f); err != nil {
+	var req http_requests.CreateFileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateFile.Handle(c.Request.Context(), command.CreateFileCommand{File: &f})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	f := &file.File{
+		UserID:           userID,
+		ClientID:         req.ClientID,
+		CompanyID:        req.CompanyID,
+		StorageReference: req.StorageReference,
+		Name:             req.Name,
+	}
+
+	res, err := h.deps.App.Commands.CreateFile.Handle(c.Request.Context(), command.CreateFileCommand{File: f})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +65,29 @@ func (h *FileHandler) GetByID(c *gin.Context) {
 // swagger:route PUT /api/v1/files/{id} files updateFile
 func (h *FileHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var f file.File
-	if err := c.ShouldBindJSON(&f); err != nil {
+	var req http_requests.UpdateFileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	f.ID = id
-	res, err := h.deps.App.Commands.UpdateFile.Handle(c.Request.Context(), command.UpdateFileCommand{File: &f})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	f := &file.File{
+		ID:               id,
+		UserID:           userID,
+		ClientID:         req.ClientID,
+		CompanyID:        req.CompanyID,
+		StorageReference: req.StorageReference,
+		Name:             req.Name,
+	}
+
+	res, err := h.deps.App.Commands.UpdateFile.Handle(c.Request.Context(), command.UpdateFileCommand{File: f})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

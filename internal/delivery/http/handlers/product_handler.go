@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/product"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/product"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,28 @@ func NewProductHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Product
 
 // swagger:route POST /api/v1/products products createProduct
 func (h *ProductHandler) Create(c *gin.Context) {
-	var p product.Product
-	if err := c.ShouldBindJSON(&p); err != nil {
+	var req http_requests.CreateProductRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateProduct.Handle(c.Request.Context(), command.CreateProductCommand{Product: &p})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	p := &product.Product{
+		UserID:      userID,
+		Name:        req.Name,
+		CompanyID:   req.CompanyID,
+		Description: req.Description,
+		Thumbnail:   req.Thumbnail,
+		Price:       req.Price,
+	}
+
+	res, err := h.deps.App.Commands.CreateProduct.Handle(c.Request.Context(), command.CreateProductCommand{Product: p})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +66,30 @@ func (h *ProductHandler) GetByID(c *gin.Context) {
 // swagger:route PUT /api/v1/products/{id} products updateProduct
 func (h *ProductHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var p product.Product
-	if err := c.ShouldBindJSON(&p); err != nil {
+	var req http_requests.UpdateProductRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	p.ID = id
-	res, err := h.deps.App.Commands.UpdateProduct.Handle(c.Request.Context(), command.UpdateProductCommand{Product: &p})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	p := &product.Product{
+		ID:          id,
+		UserID:      userID,
+		Name:        req.Name,
+		CompanyID:   req.CompanyID,
+		Description: req.Description,
+		Thumbnail:   req.Thumbnail,
+		Price:       req.Price,
+	}
+
+	res, err := h.deps.App.Commands.UpdateProduct.Handle(c.Request.Context(), command.UpdateProductCommand{Product: p})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

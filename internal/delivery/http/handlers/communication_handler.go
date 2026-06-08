@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/communication"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/communication"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,26 @@ func NewCommunicationHandler(deps *http_deps.Dependencies, logs *slog.Logger) *C
 
 // swagger:route POST /api/v1/communications communications createCommunication
 func (h *CommunicationHandler) Create(c *gin.Context) {
-	var comm communication.Communication
-	if err := c.ShouldBindJSON(&comm); err != nil {
+	var req http_requests.CreateCommunicationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateCommunication.Handle(c.Request.Context(), command.CreateCommunicationCommand{Communication: &comm})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	comm := &communication.Communication{
+		UserID:   userID,
+		ClientID: req.ClientID,
+	}
+
+	res, err := h.deps.App.Commands.CreateCommunication.Handle(c.Request.Context(), command.CreateCommunicationCommand{
+		Communication: comm,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +64,28 @@ func (h *CommunicationHandler) GetByID(c *gin.Context) {
 // swagger:route PUT /api/v1/communications/{id} communications updateCommunication
 func (h *CommunicationHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var comm communication.Communication
-	if err := c.ShouldBindJSON(&comm); err != nil {
+	var req http_requests.UpdateCommunicationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	comm.ID = id
-	res, err := h.deps.App.Commands.UpdateCommunication.Handle(c.Request.Context(), command.UpdateCommunicationCommand{Communication: &comm})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	comm := &communication.Communication{
+		ID:       id,
+		UserID:   userID,
+		ClientID: req.ClientID,
+	}
+
+	res, err := h.deps.App.Commands.UpdateCommunication.Handle(c.Request.Context(), command.UpdateCommunicationCommand{
+		Communication: comm,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

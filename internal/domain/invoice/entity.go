@@ -2,9 +2,10 @@ package invoice
 
 type Invoice struct {
 	ID           string
+	UserID       string
 	ClientID     string
 	DocumentID   string
-	CompanyID	string
+	CompanyID    string
 	InvoiceItems []InvoiceItem
 }
 

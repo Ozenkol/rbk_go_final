@@ -1,8 +1,9 @@
 package contract
 
 type Contract struct {
-	ID       string
-	ClientID string
+	ID        string
+	UserID    string
+	ClientID  string
 	CompanyID string
-	Content  string
+	Content   string
 }

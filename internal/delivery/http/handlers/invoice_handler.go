@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/invoice"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/invoice"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,26 @@ func NewInvoiceHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Invoice
 
 // swagger:route POST /api/v1/invoices invoices createInvoice
 func (h *InvoiceHandler) Create(c *gin.Context) {
-	var i invoice.Invoice
-	if err := c.ShouldBindJSON(&i); err != nil {
+	var req http_requests.CreateInvoiceRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateInvoice.Handle(c.Request.Context(), command.CreateInvoiceCommand{Invoice: &i})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	i := &invoice.Invoice{
+		UserID:     userID,
+		ClientID:   req.ClientID,
+		DocumentID: req.DocumentID,
+		CompanyID:  req.CompanyID,
+	}
+
+	res, err := h.deps.App.Commands.CreateInvoice.Handle(c.Request.Context(), command.CreateInvoiceCommand{Invoice: i})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +64,28 @@ func (h *InvoiceHandler) GetByID(c *gin.Context) {
 // swagger:route PUT /api/v1/invoices/{id} invoices updateInvoice
 func (h *InvoiceHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var i invoice.Invoice
-	if err := c.ShouldBindJSON(&i); err != nil {
+	var req http_requests.UpdateInvoiceRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	i.ID = id
-	res, err := h.deps.App.Commands.UpdateInvoice.Handle(c.Request.Context(), command.UpdateInvoiceCommand{Invoice: &i})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	i := &invoice.Invoice{
+		ID:         id,
+		UserID:     userID,
+		ClientID:   req.ClientID,
+		DocumentID: req.DocumentID,
+		CompanyID:  req.CompanyID,
+	}
+
+	res, err := h.deps.App.Commands.UpdateInvoice.Handle(c.Request.Context(), command.UpdateInvoiceCommand{Invoice: i})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
