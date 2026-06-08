@@ -299,8 +299,8 @@ func (c *Container) App() *application.Application {
 				DeleteOffer: command.NewDeleteOfferHandler(c.OfferRepository()),
 
 				CreateDocument: command.NewCreateDocumentHandler(c.DocumentRepository(), c.StorageProvider()),
-				UpdateDocument: command.NewUpdateDocumentHandler(c.DocumentRepository()),
-				DeleteDocument: command.NewDeleteDocumentHandler(c.DocumentRepository()),
+				UpdateDocument: command.NewUpdateDocumentHandler(c.DocumentRepository(), c.StorageProvider()),
+				DeleteDocument: command.NewDeleteDocumentHandler(c.DocumentRepository(), c.StorageProvider()),
 
 				CreateAnalytic: command.NewCreateAnalyticHandler(c.AnalyticRepository()),
 				UpdateAnalytic: command.NewUpdateAnalyticHandler(c.AnalyticRepository()),
@@ -362,8 +362,8 @@ func (c *Container) App() *application.Application {
 				GetOfferByID: query.NewFetchOfferByIDHandler(c.OfferRepository()),
 				ListOffers:   query.NewFetchOfferListHandler(c.OfferRepository()),
 
-				GetDocumentByID: query.NewFetchDocumentByIDHandler(c.DocumentRepository()),
-				ListDocuments:   query.NewFetchDocumentListHandler(c.DocumentRepository()),
+				GetDocumentByID: query.NewFetchDocumentByIDHandler(c.DocumentRepository(), c.StorageProvider()),
+				ListDocuments:   query.NewFetchDocumentListHandler(c.DocumentRepository(), c.StorageProvider()),
 
 				GetAnalyticByID: query.NewFetchAnalyticByIDHandler(c.AnalyticRepository()),
 				ListAnalytics:   query.NewFetchAnalyticListHandler(c.AnalyticRepository()),

@@ -17,6 +17,10 @@ func (s *MinioStorage) CreateUploadURL(ctx context.Context, key string) (string,
 	return "http://localhost:9000/upload/" + key, nil
 }
 
+func (s *MinioStorage) CreateUpdateURL(ctx context.Context, key string) (string, error) {
+	return "http://localhost:9000/update/" + key, nil
+}
+
 func (s *MinioStorage) CreateDownloadURL(ctx context.Context, key string) (string, error) {
 	return "http://localhost:9000/download/" + key, nil
 }
