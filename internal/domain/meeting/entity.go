@@ -1,10 +1,11 @@
 package meeting
 
 type Meeting struct {
-	ID       string
-	ClientID string
+	ID        string
+	UserID    string
+	ClientID  string
 	CompanyID string
-	Topic    string
+	Topic     string
 	TimeSlot TimeSlot
 	MeetingProvider MeetingProvider
 	Attendees []Attendee

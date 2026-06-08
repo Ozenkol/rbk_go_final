@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/client"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/client"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,28 @@ func NewClientHandler(deps *http_deps.Dependencies, logs *slog.Logger) *ClientHa
 
 // swagger:route POST /api/v1/clients clients createClient
 func (h *ClientHandler) CreateClient(c *gin.Context) {
-	var cl client.Client
-	if err := c.ShouldBindJSON(&cl); err != nil {
+	var req http_requests.CreateClientRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateClient.Handle(c.Request.Context(), command.CreateClientCommand{Client: &cl})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	cl := &client.Client{
+		UserID:    userID,
+		CompanyID: req.CompanyID,
+		Person:    req.Person,
+		IsActive:  req.IsActive,
+	}
+
+	res, err := h.deps.App.Commands.CreateClient.Handle(c.Request.Context(), command.CreateClientCommand{
+		Client: cl,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +66,30 @@ func (h *ClientHandler) GetClient(c *gin.Context) {
 // swagger:route PUT /api/v1/clients/{id} clients updateClient
 func (h *ClientHandler) UpdateClient(c *gin.Context) {
 	id := c.Param("id")
-	var cl client.Client
-	if err := c.ShouldBindJSON(&cl); err != nil {
+	var req http_requests.UpdateClientRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	cl.ID = id
-	res, err := h.deps.App.Commands.UpdateClient.Handle(c.Request.Context(), command.UpdateClientCommand{Client: &cl})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	cl := &client.Client{
+		ID:        id,
+		UserID:    userID,
+		CompanyID: req.CompanyID,
+		Person:    req.Person,
+		IsActive:  req.IsActive,
+	}
+
+	res, err := h.deps.App.Commands.UpdateClient.Handle(c.Request.Context(), command.UpdateClientCommand{
+		Client: cl,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

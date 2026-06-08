@@ -1,6 +1,7 @@
 package company
 
 type Company struct {
-	ID   string
-	Name string
+	ID     string
+	UserID string
+	Name   string
 }

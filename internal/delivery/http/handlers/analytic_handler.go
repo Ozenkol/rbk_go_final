@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/analytic"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/analytic"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,27 @@ func NewAnalyticHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Analyt
 
 // swagger:route POST /api/v1/analytics analytics createAnalytic
 func (h *AnalyticHandler) Create(c *gin.Context) {
-	var a analytic.Analytic
-	if err := c.ShouldBindJSON(&a); err != nil {
+	var req http_requests.CreateAnalyticRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateAnalytic.Handle(c.Request.Context(), command.CreateAnalyticCommand{Analytic: &a})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	a := &analytic.Analytic{
+		UserID:   userID,
+		ClientID: req.ClientID,
+		Data:     req.Data,
+	}
+
+	res, err := h.deps.App.Commands.CreateAnalytic.Handle(c.Request.Context(), command.CreateAnalyticCommand{
+		Analytic: a,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +65,29 @@ func (h *AnalyticHandler) GetByID(c *gin.Context) {
 // swagger:route PUT /api/v1/analytics/{id} analytics updateAnalytic
 func (h *AnalyticHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var a analytic.Analytic
-	if err := c.ShouldBindJSON(&a); err != nil {
+	var req http_requests.UpdateAnalyticRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	a.ID = id
-	res, err := h.deps.App.Commands.UpdateAnalytic.Handle(c.Request.Context(), command.UpdateAnalyticCommand{Analytic: &a})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	a := &analytic.Analytic{
+		ID:       id,
+		UserID:   userID,
+		ClientID: req.ClientID,
+		Data:     req.Data,
+	}
+
+	res, err := h.deps.App.Commands.UpdateAnalytic.Handle(c.Request.Context(), command.UpdateAnalyticCommand{
+		Analytic: a,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

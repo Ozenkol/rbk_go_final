@@ -7,6 +7,7 @@ import (
 
 type Offer struct {
 	ID         string
+	UserID     string
 	ClientID   string
 	DocumentID string
 	CompanyID  string

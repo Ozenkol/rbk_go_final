@@ -4,6 +4,7 @@ import "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 
 type Product struct {
 	ID          string
+	UserID      string
 	Name        string
 	CompanyID   string
 	Description string

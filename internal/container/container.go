@@ -298,7 +298,7 @@ func (c *Container) App() *application.Application {
 				UpdateOffer: command.NewUpdateOfferHandler(c.OfferRepository()),
 				DeleteOffer: command.NewDeleteOfferHandler(c.OfferRepository()),
 
-				CreateDocument: command.NewCreateDocumentHandler(c.DocumentRepository()),
+				CreateDocument: command.NewCreateDocumentHandler(c.DocumentRepository(), c.StorageProvider()),
 				UpdateDocument: command.NewUpdateDocumentHandler(c.DocumentRepository()),
 				DeleteDocument: command.NewDeleteDocumentHandler(c.DocumentRepository()),
 

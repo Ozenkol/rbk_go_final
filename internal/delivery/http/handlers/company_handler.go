@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/company"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/company"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,26 @@ func NewCompanyHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Company
 
 // swagger:route POST /api/v1/companies companies createCompany
 func (h *CompanyHandler) Create(c *gin.Context) {
-	var comp company.Company
-	if err := c.ShouldBindJSON(&comp); err != nil {
+	var req http_requests.CreateCompanyRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateCompany.Handle(c.Request.Context(), command.CreateCompanyCommand{Company: &comp})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	comp := &company.Company{
+		UserID: userID,
+		Name:   req.Name,
+	}
+
+	res, err := h.deps.App.Commands.CreateCompany.Handle(c.Request.Context(), command.CreateCompanyCommand{
+		Company: comp,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +64,28 @@ func (h *CompanyHandler) GetByID(c *gin.Context) {
 // swagger:route PUT /api/v1/companies/{id} companies updateCompany
 func (h *CompanyHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var comp company.Company
-	if err := c.ShouldBindJSON(&comp); err != nil {
+	var req http_requests.UpdateCompanyRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	comp.ID = id
-	res, err := h.deps.App.Commands.UpdateCompany.Handle(c.Request.Context(), command.UpdateCompanyCommand{Company: &comp})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	comp := &company.Company{
+		ID:     id,
+		UserID: userID,
+		Name:   req.Name,
+	}
+
+	res, err := h.deps.App.Commands.UpdateCompany.Handle(c.Request.Context(), command.UpdateCompanyCommand{
+		Company: comp,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

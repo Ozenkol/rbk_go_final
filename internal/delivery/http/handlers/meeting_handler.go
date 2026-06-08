@@ -6,8 +6,9 @@ import (
 
 	"github.com/Ozenkol/rbk-go-final/internal/application/command"
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/meeting"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/meeting"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,31 @@ func NewMeetingHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Meeting
 
 // swagger:route POST /api/v1/meetings meetings createMeeting
 func (h *MeetingHandler) Create(c *gin.Context) {
-	var m meeting.Meeting
-	if err := c.ShouldBindJSON(&m); err != nil {
+	var req http_requests.CreateMeetingRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	res, err := h.deps.App.Commands.CreateMeeting.Handle(c.Request.Context(), command.CreateMeetingCommand{Meeting: &m})
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	m := &meeting.Meeting{
+		UserID:          userID,
+		ClientID:        req.ClientID,
+		CompanyID:       req.CompanyID,
+		Topic:           req.Topic,
+		TimeSlot:        req.TimeSlot,
+		MeetingProvider: req.MeetingProvider,
+		Attendees:       req.Attendees,
+	}
+
+	res, err := h.deps.App.Commands.CreateMeeting.Handle(c.Request.Context(), command.CreateMeetingCommand{
+		Meeting: m,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -49,13 +69,33 @@ func (h *MeetingHandler) GetByID(c *gin.Context) {
 // swagger:route PUT /api/v1/meetings/{id} meetings updateMeeting
 func (h *MeetingHandler) Update(c *gin.Context) {
 	id := c.Param("id")
-	var m meeting.Meeting
-	if err := c.ShouldBindJSON(&m); err != nil {
+	var req http_requests.UpdateMeetingRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	m.ID = id
-	res, err := h.deps.App.Commands.UpdateMeeting.Handle(c.Request.Context(), command.UpdateMeetingCommand{Meeting: &m})
+
+	token := c.GetHeader("Authorization")
+	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	m := &meeting.Meeting{
+		ID:              id,
+		UserID:          userID,
+		ClientID:        req.ClientID,
+		CompanyID:       req.CompanyID,
+		Topic:           req.Topic,
+		TimeSlot:        req.TimeSlot,
+		MeetingProvider: req.MeetingProvider,
+		Attendees:       req.Attendees,
+	}
+
+	res, err := h.deps.App.Commands.UpdateMeeting.Handle(c.Request.Context(), command.UpdateMeetingCommand{
+		Meeting: m,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -1484,6 +1484,9 @@
         "Data": {},
         "ID": {
           "type": "string"
+        },
+        "UserID": {
+          "type": "string"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/analytic"
@@ -1532,6 +1535,9 @@
         },
         "Person": {
           "$ref": "#/definitions/Person"
+        },
+        "UserID": {
+          "type": "string"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/client"
@@ -1544,6 +1550,9 @@
         },
         "ID": {
           "type": "string"
+        },
+        "UserID": {
+          "type": "string"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/communication"
@@ -1555,6 +1564,9 @@
           "type": "string"
         },
         "Name": {
+          "type": "string"
+        },
+        "UserID": {
           "type": "string"
         }
       },
@@ -1573,6 +1585,9 @@
           "type": "string"
         },
         "ID": {
+          "type": "string"
+        },
+        "UserID": {
           "type": "string"
         }
       },
@@ -1643,6 +1658,9 @@
         },
         "StorageReference": {
           "type": "string"
+        },
+        "UserID": {
+          "type": "string"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/file"
@@ -1682,6 +1700,9 @@
           "items": {
             "$ref": "#/definitions/InvoiceItem"
           }
+        },
+        "UserID": {
+          "type": "string"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/invoice"
@@ -1730,6 +1751,9 @@
           "$ref": "#/definitions/TimeSlot"
         },
         "Topic": {
+          "type": "string"
+        },
+        "UserID": {
           "type": "string"
         }
       },
@@ -1792,6 +1816,9 @@
         },
         "Message": {
           "type": "string"
+        },
+        "UserID": {
+          "type": "string"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/notification"
@@ -1816,6 +1843,9 @@
           "items": {
             "$ref": "#/definitions/OfferItem"
           }
+        },
+        "UserID": {
+          "type": "string"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/offer"
@@ -1889,6 +1919,9 @@
         },
         "Thumbnail": {
           "$ref": "#/definitions/StorageReference"
+        },
+        "UserID": {
+          "type": "string"
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/product"
@@ -1903,6 +1936,9 @@
           "type": "string"
         },
         "Key": {
+          "type": "string"
+        },
+        "UserID": {
           "type": "string"
         },
         "Value": {
@@ -1930,6 +1966,9 @@
           "type": "string"
         },
         "Name": {
+          "type": "string"
+        },
+        "UserID": {
           "type": "string"
         }
       },

@@ -69,6 +69,7 @@ func (s *AuthService) Authenticate(username, password string) (TokenPair, error)
 }
 
 func (s *AuthService) GetUserByToken(token string) (string, error) {
+	token = stripBearerPrefix(token)
 	valid, err := validateToken(token)
 	if err != nil {
 		return "", err
@@ -84,6 +85,7 @@ func (s *AuthService) GetUserByToken(token string) (string, error) {
 }
 
 func (s *AuthService) ValidateAccessToken(accessToken string) (bool, error) {
+	accessToken = stripBearerPrefix(accessToken)
 	valid, err := validateToken(accessToken)
 	if err != nil {
 		return false, err
@@ -163,11 +165,11 @@ func getUserIdFromToken(tokenString string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("invalid token claims")
 	}
-	jti, ok := claims["user_id"].(string)
+	userID, ok := claims["user_id"].(string)
 	if !ok {
-		return "", fmt.Errorf("invalid refresh token ID")
+		return "", fmt.Errorf("invalid user ID in token")
 	}
-	return jti, nil
+	return userID, nil
 }
 
 func getRefreshIdFromToken(tokenString string) (string, error) {
@@ -189,4 +191,11 @@ func getRefreshIdFromToken(tokenString string) (string, error) {
 		return "", fmt.Errorf("invalid refresh token ID")
 	}
 	return jti, nil
+}
+
+func stripBearerPrefix(token string) string {
+	if len(token) > 7 && token[:7] == "Bearer " {
+		return token[7:]
+	}
+	return token
 }
