@@ -1,61 +1,21 @@
 package api_requests
 
 import (
-	"github.com/Ozenkol/rbk-go-final/internal/domain/task"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/note"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/document"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/client"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/analytic"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/communication"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/company"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/contract"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/file"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/invoice"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/meeting"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/notification"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/offer"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/product"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/setting"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/tag"
+	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
 )
 
 // swagger:parameters createUser
 type createUserParams struct {
-    // in: body
-    // required: true
-    Body struct {
-        FirstName string `json:"first_name"`
-		MiddleName string `json:"middle_name,omitempty"`
-        LastName  string `json:"last_name"`
-        Email     string `json:"email"`
-        Password  string `json:"password"`
-    }
+	// in: body
+	// required: true
+	Body http_requests.CreateUserRequest
 }
 
 // swagger:parameters registerUser
 type registerUserParams struct {
 	// in: body
 	// required: true
-	Body struct {
-		// required: true
-		// default: John
-		FirstName  string `json:"first_name"`
-		// required: true
-		// default: Smith
-		MiddleName string `json:"middle_name,omitempty"`
-
-		// required: true
-		// default: Adams
-		LastName   string `json:"last_name"`
-
-		// required: true
-		// default: test@example.com
-		Email      string `json:"email"`
-
-		// required: true
-		// default: 123456
-		Password   string `json:"password"`
-	}
+	Body http_requests.CreateUserRequest
 }
 
 // swagger:parameters loginUser
@@ -64,11 +24,11 @@ type loginUserParams struct {
 	// required: true
 	Body struct {
 		// required: true
-		// default: test@example.com
+		// example: test@example.com
 		Email string `json:"email"`
 
 		// required: true
-		// default: 123456
+		// example: 123456
 		Password string `json:"password"`
 	}
 }
@@ -77,7 +37,7 @@ type loginUserParams struct {
 type createTaskParams struct {
 	// in: body
 	// required: true
-	Body task.Task
+	Body http_requests.CreateTaskRequest
 }
 
 // swagger:parameters getTask deleteTask toggleTask
@@ -94,14 +54,14 @@ type updateTaskParams struct {
 	ID string `json:"id"`
 	// in: body
 	// required: true
-	Body task.Task
+	Body http_requests.UpdateTaskRequest
 }
 
 // swagger:parameters createNote
 type createNoteParams struct {
 	// in: body
 	// required: true
-	Body note.Note
+	Body http_requests.CreateNoteRequest
 }
 
 // swagger:parameters getNote updateNote deleteNote
@@ -115,7 +75,7 @@ type noteIDParams struct {
 type createDocumentParams struct {
 	// in: body
 	// required: true
-	Body document.Document
+	Body http_requests.CreateDocumentRequest
 }
 
 // swagger:parameters getDocument updateDocument deleteDocument
@@ -129,7 +89,7 @@ type documentIDParams struct {
 type createClientParams struct {
 	// in: body
 	// required: true
-	Body client.Client
+	Body http_requests.CreateClientRequest
 }
 
 // swagger:parameters getClient updateClient deleteClient
@@ -143,7 +103,7 @@ type clientIDParams struct {
 type createAnalyticParams struct {
 	// in: body
 	// required: true
-	Body analytic.Analytic
+	Body http_requests.CreateAnalyticRequest
 }
 
 // swagger:parameters getAnalytic updateAnalytic deleteAnalytic
@@ -157,7 +117,7 @@ type analyticIDParams struct {
 type createCommunicationParams struct {
 	// in: body
 	// required: true
-	Body communication.Communication
+	Body http_requests.CreateCommunicationRequest
 }
 
 // swagger:parameters getCommunication updateCommunication deleteCommunication
@@ -171,7 +131,7 @@ type communicationIDParams struct {
 type createCompanyParams struct {
 	// in: body
 	// required: true
-	Body company.Company
+	Body http_requests.CreateCompanyRequest
 }
 
 // swagger:parameters getCompany updateCompany deleteCompany
@@ -185,7 +145,7 @@ type companyIDParams struct {
 type createContractParams struct {
 	// in: body
 	// required: true
-	Body contract.Contract
+	Body http_requests.CreateContractRequest
 }
 
 // swagger:parameters getContract updateContract deleteContract
@@ -199,7 +159,7 @@ type contractIDParams struct {
 type createFileParams struct {
 	// in: body
 	// required: true
-	Body file.File
+	Body http_requests.CreateFileRequest
 }
 
 // swagger:parameters getFile updateFile deleteFile
@@ -213,7 +173,7 @@ type fileIDParams struct {
 type createInvoiceParams struct {
 	// in: body
 	// required: true
-	Body invoice.Invoice
+	Body http_requests.CreateInvoiceRequest
 }
 
 // swagger:parameters getInvoice updateInvoice deleteInvoice
@@ -227,7 +187,7 @@ type invoiceIDParams struct {
 type createMeetingParams struct {
 	// in: body
 	// required: true
-	Body meeting.Meeting
+	Body http_requests.CreateMeetingRequest
 }
 
 // swagger:parameters getMeeting updateMeeting deleteMeeting
@@ -241,7 +201,7 @@ type meetingIDParams struct {
 type createNotificationParams struct {
 	// in: body
 	// required: true
-	Body notification.Notification
+	Body http_requests.CreateNotificationRequest
 }
 
 // swagger:parameters getNotification updateNotification deleteNotification
@@ -255,7 +215,7 @@ type notificationIDParams struct {
 type createOfferParams struct {
 	// in: body
 	// required: true
-	Body offer.Offer
+	Body http_requests.CreateOfferRequest
 }
 
 // swagger:parameters getOffer updateOffer deleteOffer
@@ -269,7 +229,7 @@ type offerIDParams struct {
 type createProductParams struct {
 	// in: body
 	// required: true
-	Body product.Product
+	Body http_requests.CreateProductRequest
 }
 
 // swagger:parameters getProduct updateProduct deleteProduct
@@ -283,7 +243,7 @@ type productIDParams struct {
 type createSettingParams struct {
 	// in: body
 	// required: true
-	Body setting.Setting
+	Body http_requests.CreateSettingRequest
 }
 
 // swagger:parameters getSetting updateSetting deleteSetting
@@ -297,7 +257,7 @@ type settingIDParams struct {
 type createTagParams struct {
 	// in: body
 	// required: true
-	Body tag.Tag
+	Body http_requests.CreateTagRequest
 }
 
 // swagger:parameters getTag updateTag deleteTag

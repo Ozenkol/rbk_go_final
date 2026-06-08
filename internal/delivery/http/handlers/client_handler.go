@@ -22,14 +22,21 @@ func NewClientHandler(deps *http_deps.Dependencies, logs *slog.Logger) *ClientHa
 }
 
 // swagger:route POST /api/v1/clients clients createClient
+// Создать нового клиента.
+// Security:
+//   Bearer:
+// responses:
+//   201: getClientResponse
+//   400: errorResponse
 func (h *ClientHandler) CreateClient(c *gin.Context) {
 	var req http_requests.CreateClientRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -37,7 +44,7 @@ func (h *ClientHandler) CreateClient(c *gin.Context) {
 
 	cl := &client.Client{
 		UserID:    userID,
-		CompanyID: req.CompanyID,
+		CompanyID: companyID,
 		Person:    req.Person,
 		IsActive:  req.IsActive,
 	}
@@ -53,6 +60,12 @@ func (h *ClientHandler) CreateClient(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/clients/{id} clients getClient
+// Получить клиента по ID.
+// Security:
+//   Bearer:
+// responses:
+//   200: getClientResponse
+//   404: errorResponse
 func (h *ClientHandler) GetClient(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetClientByID.Handle(c.Request.Context(), query.FetchClientByID{ID: id})
@@ -63,7 +76,29 @@ func (h *ClientHandler) GetClient(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// swagger:route GET /api/v1/clients clients listClients
+// Список всех клиентов.
+// Security:
+//   Bearer:
+// responses:
+//   200: []getClientResponse
+//   500: errorResponse
+func (h *ClientHandler) ListClients(c *gin.Context) {
+	res, err := h.deps.App.Queries.ListClients.Handle(c.Request.Context(), query.FetchClientList{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 // swagger:route PUT /api/v1/clients/{id} clients updateClient
+// Обновить клиента по ID.
+// Security:
+//   Bearer:
+// responses:
+//   200: getClientResponse
+//   400: errorResponse
 func (h *ClientHandler) UpdateClient(c *gin.Context) {
 	id := c.Param("id")
 	var req http_requests.UpdateClientRequest
@@ -73,7 +108,7 @@ func (h *ClientHandler) UpdateClient(c *gin.Context) {
 	}
 
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -82,7 +117,7 @@ func (h *ClientHandler) UpdateClient(c *gin.Context) {
 	cl := &client.Client{
 		ID:        id,
 		UserID:    userID,
-		CompanyID: req.CompanyID,
+		CompanyID: companyID,
 		Person:    req.Person,
 		IsActive:  req.IsActive,
 	}
@@ -98,6 +133,12 @@ func (h *ClientHandler) UpdateClient(c *gin.Context) {
 }
 
 // swagger:route DELETE /api/v1/clients/{id} clients deleteClient
+// Удалить клиента по ID.
+// Security:
+//   Bearer:
+// responses:
+//   204:
+//   500: errorResponse
 func (h *ClientHandler) DeleteClient(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteClient.Handle(c.Request.Context(), command.DeleteClientCommand{ID: id})
@@ -106,14 +147,4 @@ func (h *ClientHandler) DeleteClient(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusNoContent, nil)
-}
-
-// swagger:route GET /api/v1/clients clients listClients
-func (h *ClientHandler) ListClients(c *gin.Context) {
-	res, err := h.deps.App.Queries.ListClients.Handle(c.Request.Context(), query.FetchClientList{})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, res)
 }
