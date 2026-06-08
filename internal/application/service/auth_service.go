@@ -84,6 +84,44 @@ func (s *AuthService) GetUserByToken(token string) (string, error) {
 	return userId, nil
 }
 
+func (s *AuthService) GetAuthInfoFromToken(token string) (string, string, error) {
+	token = stripBearerPrefix(token)
+	valid, err := validateToken(token)
+	if err != nil {
+		return "", "", err
+	}
+	if !valid {
+		return "", "", fmt.Errorf("invalid token")
+	}
+
+	t, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("invalid token signing method")
+		}
+		return secretKey, nil
+	})
+	if err != nil {
+		return "", "", err
+	}
+
+	claims, ok := t.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", "", fmt.Errorf("invalid token claims")
+	}
+
+	userID, ok := claims["user_id"].(string)
+	if !ok {
+		return "", "", fmt.Errorf("invalid user ID in token")
+	}
+
+	companyID, ok := claims["company_id"].(string)
+	if !ok {
+		return "", "", fmt.Errorf("invalid company ID in token")
+	}
+
+	return userID, companyID, nil
+}
+
 func (s *AuthService) ValidateAccessToken(accessToken string) (bool, error) {
 	accessToken = stripBearerPrefix(accessToken)
 	valid, err := validateToken(accessToken)
@@ -100,12 +138,13 @@ func generateRefreshToken(user *user.User) (string, error) {
 	fmt.Printf("Generating refresh token for user: %s\n", user.Email)
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"user_id": user.ID,
-			"sub": user.Email,
-			"jti": fmt.Sprintf("%d", time.Now().UnixNano()), // Unique identifier for the token
-			"iss": "rbk",
-			"exp": time.Now().Add(time.Hour * 72).Unix(),
-			"iat": time.Now().Unix(),
+			"user_id":    user.ID,
+			"company_id": user.CompanyID,
+			"sub":        user.Email,
+			"jti":        fmt.Sprintf("%d", time.Now().UnixNano()), // Unique identifier for the token
+			"iss":        "rbk",
+			"exp":        time.Now().Add(time.Hour * 72).Unix(),
+			"iat":        time.Now().Unix(),
 		},
 	)
 	fmt.Printf("Claims for user %s: %v\n", user.Email, claims.Claims)
@@ -118,14 +157,15 @@ func generateRefreshToken(user *user.User) (string, error) {
 }
 
 func generateAccessToken(user *user.User) (string, error) {
-	fmt.Printf("Generating refresh token for user: %s\n", user.Email)
+	fmt.Printf("Generating access token for user: %s\n", user.Email)
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"user_id": user.ID,
-			"sub": user.Email,
-			"iss": "rbk",
-			"exp": time.Now().Add(time.Hour * 72).Unix(),
-			"iat": time.Now().Unix(),
+			"user_id":    user.ID,
+			"company_id": user.CompanyID,
+			"sub":        user.Email,
+			"iss":        "rbk",
+			"exp":        time.Now().Add(time.Hour * 72).Unix(),
+			"iat":        time.Now().Unix(),
 		},
 	)
 	fmt.Printf("Claims for user %s: %v\n", user.Email, claims.Claims)
@@ -133,7 +173,7 @@ func generateAccessToken(user *user.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("Generated refresh token for user %s: %s\n", user.Email, token)
+	fmt.Printf("Generated access token for user %s: %s\n", user.Email, token)
 	return token, nil
 }
 

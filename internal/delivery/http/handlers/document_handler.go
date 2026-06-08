@@ -36,7 +36,7 @@ func (h *DocumentHandler) CreateDocument(c *gin.Context) {
 	}
 
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -45,7 +45,7 @@ func (h *DocumentHandler) CreateDocument(c *gin.Context) {
 	d := &document.Document{
 		UserID:         userID,
 		ClientID:       req.ClientID,
-		CompanyID:      req.CompanyID,
+		CompanyID:      companyID,
 		Type:           req.Type,
 		Number:         req.Number,
 		IssuedBy:       req.IssuedBy,
@@ -80,6 +80,22 @@ func (h *DocumentHandler) GetDocument(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// swagger:route GET /api/v1/documents documents listDocuments
+// List all documents.
+// security:
+//   - Bearer:
+// responses:
+//   200: []getDocumentResponse
+//   500: errorResponse
+func (h *DocumentHandler) ListDocuments(c *gin.Context) {
+	res, err := h.deps.App.Queries.ListDocuments.Handle(c.Request.Context(), query.FetchDocumentList{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 // swagger:route PUT /api/v1/documents/{id} documents updateDocument
 // Update a document by ID.
 // security:
@@ -96,7 +112,7 @@ func (h *DocumentHandler) UpdateDocument(c *gin.Context) {
 	}
 
 	token := c.GetHeader("Authorization")
-	userID, err := h.deps.App.Services.AuthService.GetUserByToken(token)
+	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
@@ -106,7 +122,7 @@ func (h *DocumentHandler) UpdateDocument(c *gin.Context) {
 		ID:             id,
 		UserID:         userID,
 		ClientID:       req.ClientID,
-		CompanyID:      req.CompanyID,
+		CompanyID:      companyID,
 		Type:           req.Type,
 		Number:         req.Number,
 		IssuedBy:       req.IssuedBy,

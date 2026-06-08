@@ -9,6 +9,13 @@ type UploadURLProvider interface {
 	) (string, error)
 }
 
+type UpdateURLProvider interface {
+	CreateUpdateURL(
+		ctx context.Context,
+		key string,
+	) (string, error)
+}
+
 type DownloadURLProvider interface {
 	CreateDownloadURL(
 		ctx context.Context,
@@ -25,6 +32,7 @@ type ObjectDeleter interface {
 
 type ObjectStorageProvider interface {
 	UploadURLProvider
+	UpdateURLProvider
 	DownloadURLProvider
 	ObjectDeleter
 }
