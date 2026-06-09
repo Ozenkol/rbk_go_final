@@ -22,6 +22,11 @@ func NewNotificationHandler(deps *http_deps.Dependencies, logs *slog.Logger) *No
 }
 
 // swagger:route POST /api/v1/notifications notifications createNotification
+// Security:
+//   Bearer:
+// responses:
+//   201: getNotificationResponse
+//   400: errorResponse
 func (h *NotificationHandler) Create(c *gin.Context) {
 	var req http_requests.CreateNotificationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -50,6 +55,11 @@ func (h *NotificationHandler) Create(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/notifications/{id} notifications getNotification
+// Security:
+//   Bearer:
+// responses:
+//   200: getNotificationResponse
+//   404: errorResponse
 func (h *NotificationHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetNotificationByID.Handle(c.Request.Context(), query.FetchNotificationByID{ID: id})
@@ -61,6 +71,12 @@ func (h *NotificationHandler) GetByID(c *gin.Context) {
 }
 
 // swagger:route PUT /api/v1/notifications/{id} notifications updateNotification
+// Security:
+//   Bearer:
+// responses:
+//   200: getNotificationResponse
+//   400: errorResponse
+//   404: errorResponse
 func (h *NotificationHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req http_requests.UpdateNotificationRequest
@@ -92,6 +108,11 @@ func (h *NotificationHandler) Update(c *gin.Context) {
 }
 
 // swagger:route DELETE /api/v1/notifications/{id} notifications deleteNotification
+// Security:
+//   Bearer:
+// responses:
+//   204:
+//   500: errorResponse
 func (h *NotificationHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteNotification.Handle(c.Request.Context(), command.DeleteNotificationCommand{ID: id})
@@ -103,6 +124,11 @@ func (h *NotificationHandler) Delete(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/notifications notifications listNotifications
+// Security:
+//   Bearer:
+// responses:
+//   200: listNotificationsResponse
+//   500: errorResponse
 func (h *NotificationHandler) List(c *gin.Context) {
 	res, err := h.deps.App.Queries.ListNotifications.Handle(c.Request.Context(), query.FetchNotificationList{})
 	if err != nil {

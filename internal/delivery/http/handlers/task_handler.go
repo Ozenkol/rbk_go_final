@@ -23,6 +23,13 @@ func NewTaskHandler(deps *http_deps.Dependencies, logs *slog.Logger) *TaskHandle
 	return &TaskHandler{deps: deps, logs: logs}
 }
 
+// swagger:route POST /api/v1/tasks tasks createTask
+// Создать новую задачу.
+// Security:
+//   Bearer:
+// responses:
+//   201: createTaskResponse
+//   400: errorResponse
 func (h *TaskHandler) CreateTask(c *gin.Context) {
 	var req http_requests.CreateTaskRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -60,6 +67,13 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 	c.JSON(http.StatusCreated, res)
 }
 
+// swagger:route GET /api/v1/tasks/{id} tasks getTask
+// Получить задачу по ID.
+// Security:
+//   Bearer:
+// responses:
+//   200: getTaskResponse
+//   404: errorResponse
 func (h *TaskHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetTaskByID.Handle(c.Request.Context(), query.FetchTaskByID{ID: id})
@@ -70,6 +84,14 @@ func (h *TaskHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// swagger:route PUT /api/v1/tasks/{id} tasks updateTask
+// Обновить задачу по ID.
+// Security:
+//   Bearer:
+// responses:
+//   200: getTaskResponse
+//   400: errorResponse
+//   404: errorResponse
 func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	id := c.Param("id")
 	var req http_requests.UpdateTaskRequest
@@ -98,6 +120,13 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+// swagger:route DELETE /api/v1/tasks/{id} tasks deleteTask
+// Удалить задачу по ID.
+// Security:
+//   Bearer:
+// responses:
+//   204: deleteTaskResponse
+//   500: errorResponse
 func (h *TaskHandler) DeleteTask(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteTask.Handle(c.Request.Context(), command.DeleteTaskCommand{ID: id})

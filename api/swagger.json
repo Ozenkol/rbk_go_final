@@ -15,7 +15,20 @@
         "tags": [
           "analytics"
         ],
-        "operationId": "listAnalytics"
+        "operationId": "listAnalytics",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/listAnalyticsResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -30,6 +43,19 @@
             "schema": {
               "$ref": "#/definitions/CreateAnalyticRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getAnalyticResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -48,6 +74,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getAnalyticResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
@@ -63,6 +102,22 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getAnalyticResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
@@ -77,6 +132,19 @@
             "name": "id",
             "in": "path",
             "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -297,7 +365,20 @@
         "tags": [
           "communications"
         ],
-        "operationId": "listCommunications"
+        "operationId": "listCommunications",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/listCommunicationsResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -312,6 +393,19 @@
             "schema": {
               "$ref": "#/definitions/CreateCommunicationRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getCommunicationResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -330,6 +424,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getCommunicationResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
@@ -344,6 +451,22 @@
             "name": "id",
             "in": "path",
             "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getCommunicationResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       },
@@ -360,6 +483,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       }
     },
@@ -368,7 +504,20 @@
         "tags": [
           "companies"
         ],
-        "operationId": "listCompanies"
+        "operationId": "listCompanies",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/listCompaniesResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -383,6 +532,19 @@
             "schema": {
               "$ref": "#/definitions/CreateCompanyRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getCompanyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -401,6 +563,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getCompanyResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
@@ -416,6 +591,22 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getCompanyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
@@ -430,6 +621,19 @@
             "name": "id",
             "in": "path",
             "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -1489,7 +1693,20 @@
         "tags": [
           "notifications"
         ],
-        "operationId": "listNotifications"
+        "operationId": "listNotifications",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/listNotificationsResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -1504,6 +1721,19 @@
             "schema": {
               "$ref": "#/definitions/CreateNotificationRequest"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/getNotificationResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -1522,6 +1752,19 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getNotificationResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "put": {
@@ -1537,6 +1780,22 @@
             "in": "path",
             "required": true
           }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getNotificationResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
         ]
       },
       "delete": {
@@ -1551,6 +1810,19 @@
             "name": "id",
             "in": "path",
             "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
           }
         ]
       }
@@ -2156,6 +2428,138 @@
         ]
       }
     },
+    "/api/v1/tasks": {
+      "post": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Создать новую задачу.",
+        "operationId": "createTask",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateTaskRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/createTaskResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tasks/{id}": {
+      "get": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Получить задачу по ID.",
+        "operationId": "getTask",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getTaskResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Обновить задачу по ID.",
+        "operationId": "updateTask",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateTaskRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getTaskResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "tasks"
+        ],
+        "summary": "Удалить задачу по ID.",
+        "operationId": "deleteTask",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/deleteTaskResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/users": {
       "post": {
         "description": "CreateUser (for consistency, though registration is preferred)",
@@ -2181,7 +2585,20 @@
           "users"
         ],
         "summary": "Get a user by ID.",
-        "operationId": "getUser"
+        "operationId": "getUser",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/getUserResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     }
   },

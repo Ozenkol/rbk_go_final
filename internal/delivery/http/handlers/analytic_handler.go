@@ -22,6 +22,11 @@ func NewAnalyticHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Analyt
 }
 
 // swagger:route POST /api/v1/analytics analytics createAnalytic
+// Security:
+//   Bearer:
+// responses:
+//   201: getAnalyticResponse
+//   400: errorResponse
 func (h *AnalyticHandler) Create(c *gin.Context) {
 	var req http_requests.CreateAnalyticRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -52,6 +57,11 @@ func (h *AnalyticHandler) Create(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/analytics/{id} analytics getAnalytic
+// Security:
+//   Bearer:
+// responses:
+//   200: getAnalyticResponse
+//   404: errorResponse
 func (h *AnalyticHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetAnalyticByID.Handle(c.Request.Context(), query.FetchAnalyticByID{ID: id})
@@ -63,6 +73,12 @@ func (h *AnalyticHandler) GetByID(c *gin.Context) {
 }
 
 // swagger:route PUT /api/v1/analytics/{id} analytics updateAnalytic
+// Security:
+//   Bearer:
+// responses:
+//   200: getAnalyticResponse
+//   400: errorResponse
+//   404: errorResponse
 func (h *AnalyticHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req http_requests.UpdateAnalyticRequest
@@ -96,6 +112,11 @@ func (h *AnalyticHandler) Update(c *gin.Context) {
 }
 
 // swagger:route DELETE /api/v1/analytics/{id} analytics deleteAnalytic
+// Security:
+//   Bearer:
+// responses:
+//   204:
+//   500: errorResponse
 func (h *AnalyticHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteAnalytic.Handle(c.Request.Context(), command.DeleteAnalyticCommand{ID: id})
@@ -107,6 +128,11 @@ func (h *AnalyticHandler) Delete(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/analytics analytics listAnalytics
+// Security:
+//   Bearer:
+// responses:
+//   200: listAnalyticsResponse
+//   500: errorResponse
 func (h *AnalyticHandler) List(c *gin.Context) {
 	res, err := h.deps.App.Queries.ListAnalytics.Handle(c.Request.Context(), query.FetchAnalyticList{})
 	if err != nil {

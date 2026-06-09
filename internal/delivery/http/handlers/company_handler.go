@@ -22,6 +22,11 @@ func NewCompanyHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Company
 }
 
 // swagger:route POST /api/v1/companies companies createCompany
+// Security:
+//   Bearer:
+// responses:
+//   201: getCompanyResponse
+//   400: errorResponse
 func (h *CompanyHandler) Create(c *gin.Context) {
 	var req http_requests.CreateCompanyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -51,6 +56,11 @@ func (h *CompanyHandler) Create(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/companies/{id} companies getCompany
+// Security:
+//   Bearer:
+// responses:
+//   200: getCompanyResponse
+//   404: errorResponse
 func (h *CompanyHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetCompanyByID.Handle(c.Request.Context(), query.FetchCompanyByID{ID: id})
@@ -62,6 +72,12 @@ func (h *CompanyHandler) GetByID(c *gin.Context) {
 }
 
 // swagger:route PUT /api/v1/companies/{id} companies updateCompany
+// Security:
+//   Bearer:
+// responses:
+//   200: getCompanyResponse
+//   400: errorResponse
+//   404: errorResponse
 func (h *CompanyHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req http_requests.UpdateCompanyRequest
@@ -94,6 +110,11 @@ func (h *CompanyHandler) Update(c *gin.Context) {
 }
 
 // swagger:route DELETE /api/v1/companies/{id} companies deleteCompany
+// Security:
+//   Bearer:
+// responses:
+//   204:
+//   500: errorResponse
 func (h *CompanyHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteCompany.Handle(c.Request.Context(), command.DeleteCompanyCommand{ID: id})
@@ -105,6 +126,11 @@ func (h *CompanyHandler) Delete(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/companies companies listCompanies
+// Security:
+//   Bearer:
+// responses:
+//   200: listCompaniesResponse
+//   500: errorResponse
 func (h *CompanyHandler) List(c *gin.Context) {
 	res, err := h.deps.App.Queries.ListCompanies.Handle(c.Request.Context(), query.FetchCompanyList{})
 	if err != nil {
