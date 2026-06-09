@@ -20,6 +20,11 @@ func NewUserHandler(deps *http_deps.Dependencies, logs *slog.Logger) *UserHandle
 
 // swagger:route GET /api/v1/users/{id} users getUser
 // Get a user by ID.
+// Security:
+//   Bearer:
+// responses:
+//   200: getUserResponse
+//   404: errorResponse
 func (h *UserHandler) GetUser(c *gin.Context) {
 	id := c.Param("id")
 	u, err := h.deps.App.Queries.GetUserByID.Handle(c.Request.Context(), query.FetchUserByID{ID: id})
