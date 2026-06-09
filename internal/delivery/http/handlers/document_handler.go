@@ -10,6 +10,7 @@ import (
 	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/document"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type DocumentHandler struct {
@@ -23,11 +24,11 @@ func NewDocumentHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Docume
 
 // swagger:route POST /api/v1/documents documents createDocument
 // Create a new document.
-// security:
-//   - Bearer:
+// Security:
+//   Bearer:
 // responses:
-//   201: getDocumentResponse
-//   400: errorResponse
+//   201: body:Document
+//   400: body:errorResponse
 func (h *DocumentHandler) CreateDocument(c *gin.Context) {
 	var req http_requests.CreateDocumentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -42,9 +43,12 @@ func (h *DocumentHandler) CreateDocument(c *gin.Context) {
 		return
 	}
 
-	d := &document.Document{
+	doc := &document.Document{
+		ID:             uuid.New().String(),
 		UserID:         userID,
 		ClientID:       req.ClientID,
+		DealID:         req.DealID,
+		ContractID:     req.ContractID,
 		CompanyID:      companyID,
 		Type:           req.Type,
 		Number:         req.Number,
@@ -53,9 +57,7 @@ func (h *DocumentHandler) CreateDocument(c *gin.Context) {
 		ExpirationDate: req.ExpirationDate,
 	}
 
-	res, err := h.deps.App.Commands.CreateDocument.Handle(c.Request.Context(), command.CreateDocumentCommand{
-		Document: d,
-	})
+	res, err := h.deps.App.Commands.CreateDocument.Handle(c.Request.Context(), command.CreateDocumentCommand{Document: doc})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -64,12 +66,12 @@ func (h *DocumentHandler) CreateDocument(c *gin.Context) {
 }
 
 // swagger:route GET /api/v1/documents/{id} documents getDocument
-// Get a document by ID.
-// security:
-//   - Bearer:
+// Get document by ID.
+// Security:
+//   Bearer:
 // responses:
-//   200: getDocumentResponse
-//   404: errorResponse
+//   200: body:Document
+//   404: body:errorResponse
 func (h *DocumentHandler) GetDocument(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetDocumentByID.Handle(c.Request.Context(), query.FetchDocumentByID{ID: id})
@@ -82,11 +84,10 @@ func (h *DocumentHandler) GetDocument(c *gin.Context) {
 
 // swagger:route GET /api/v1/documents documents listDocuments
 // List all documents.
-// security:
-//   - Bearer:
+// Security:
+//   Bearer:
 // responses:
-//   200: []getDocumentResponse
-//   500: errorResponse
+//   200: body:[]DocumentWithURL
 func (h *DocumentHandler) ListDocuments(c *gin.Context) {
 	res, err := h.deps.App.Queries.ListDocuments.Handle(c.Request.Context(), query.FetchDocumentList{})
 	if err != nil {
@@ -97,12 +98,13 @@ func (h *DocumentHandler) ListDocuments(c *gin.Context) {
 }
 
 // swagger:route PUT /api/v1/documents/{id} documents updateDocument
-// Update a document by ID.
-// security:
-//   - Bearer:
+// Update an existing document.
+// Security:
+//   Bearer:
 // responses:
-//   200: getDocumentResponse
-//   400: errorResponse
+//   200: body:Document
+//   400: body:errorResponse
+//   404: body:errorResponse
 func (h *DocumentHandler) UpdateDocument(c *gin.Context) {
 	id := c.Param("id")
 	var req http_requests.UpdateDocumentRequest
@@ -111,28 +113,20 @@ func (h *DocumentHandler) UpdateDocument(c *gin.Context) {
 		return
 	}
 
-	token := c.GetHeader("Authorization")
-	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
+	resByID, err := h.deps.App.Queries.GetDocumentByID.Handle(c.Request.Context(), query.FetchDocumentByID{ID: id})
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Document not found"})
 		return
 	}
+	doc := resByID.Document
 
-	d := &document.Document{
-		ID:             id,
-		UserID:         userID,
-		ClientID:       req.ClientID,
-		CompanyID:      companyID,
-		Type:           req.Type,
-		Number:         req.Number,
-		IssuedBy:       req.IssuedBy,
-		IssuedDate:     req.IssuedDate,
-		ExpirationDate: req.ExpirationDate,
-	}
+	if req.Type != "" { doc.Type = req.Type }
+	if req.Number != "" { doc.Number = req.Number }
+	if req.IssuedBy != "" { doc.IssuedBy = req.IssuedBy }
+	if req.IssuedDate != 0 { doc.IssuedDate = req.IssuedDate }
+	if req.ExpirationDate != 0 { doc.ExpirationDate = req.ExpirationDate }
 
-	res, err := h.deps.App.Commands.UpdateDocument.Handle(c.Request.Context(), command.UpdateDocumentCommand{
-		Document: d,
-	})
+	res, err := h.deps.App.Commands.UpdateDocument.Handle(c.Request.Context(), command.UpdateDocumentCommand{Document: doc})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -141,12 +135,12 @@ func (h *DocumentHandler) UpdateDocument(c *gin.Context) {
 }
 
 // swagger:route DELETE /api/v1/documents/{id} documents deleteDocument
-// Delete a document by ID.
-// security:
-//   - Bearer:
+// Delete document by ID.
+// Security:
+//   Bearer:
 // responses:
 //   204:
-//   500: errorResponse
+//   500: body:errorResponse
 func (h *DocumentHandler) DeleteDocument(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteDocument.Handle(c.Request.Context(), command.DeleteDocumentCommand{ID: id})
@@ -154,5 +148,5 @@ func (h *DocumentHandler) DeleteDocument(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusNoContent, nil)
+	c.Status(http.StatusNoContent)
 }

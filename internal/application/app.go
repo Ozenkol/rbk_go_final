@@ -21,6 +21,10 @@ type Commands struct {
 	UpdateClient *command.UpdateClientHandler
 	DeleteClient *command.DeleteClientHandler
 
+	CreateDeal *command.CreateDealHandler
+	UpdateDeal *command.UpdateDealHandler
+	DeleteDeal *command.DeleteDealHandler
+
 	CreateTask *command.CreateTaskHandler
 	UpdateTask *command.UpdateTaskHandler
 	DeleteTask *command.DeleteTaskHandler
@@ -29,9 +33,9 @@ type Commands struct {
 	UpdateNote *command.UpdateNoteHandler
 	DeleteNote *command.DeleteNoteHandler
 
-	CreateOffer *command.CreateOfferHandler
-	UpdateOffer *command.UpdateOfferHandler
-	DeleteOffer *command.DeleteOfferHandler
+	CreateProposal *command.CreateProposalHandler
+	UpdateProposal *command.UpdateProposalHandler
+	DeleteProposal *command.DeleteProposalHandler
 
 	CreateDocument *command.CreateDocumentHandler
 	UpdateDocument *command.UpdateDocumentHandler
@@ -89,14 +93,17 @@ type Queries struct {
 	GetClientByID *query.FetchClientByIDHandler
 	ListClients   *query.FetchClientListHandler
 
+	GetDealByID *query.FetchDealByIDHandler
+	ListDeals   *query.FetchDealListHandler
+
 	GetTaskByID *query.FetchTaskByIDHandler
 	ListTasks   *query.FetchTaskListHandler
 
 	GetNoteByID *query.FetchNoteByIDHandler
 	ListNotes   *query.FetchNoteListHandler
 
-	GetOfferByID *query.FetchOfferByIDHandler
-	ListOffers   *query.FetchOfferListHandler
+	GetProposalByID *query.FetchProposalByIDHandler
+	ListProposals   *query.FetchProposalListHandler
 
 	GetDocumentByID *query.FetchDocumentByIDHandler
 	ListDocuments   *query.FetchDocumentListHandler

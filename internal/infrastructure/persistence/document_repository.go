@@ -7,16 +7,20 @@ import (
 )
 
 type DocumentModel struct {
-	ID             string `gorm:"primaryKey"`
-	UserID         string
-	ClientID       string
-	CompanyID      string
-	Type           string
-	Number         string
-	IssuedBy       string
-	URL            string
-	IssuedDate     string
-	ExpirationDate string
+	gorm.Model
+	ID               string `gorm:"primaryKey"`
+	UserID           string
+	ClientID         string
+	DealID           string
+	ContractID       string
+	CompanyID        string
+	Type             string
+	Number           string
+	IssuedBy         string
+	StorageService   string
+	StorageURL       string
+	IssuedDate       int64
+	ExpirationDate   int64
 }
 
 type DocumentRepository struct {
@@ -63,39 +67,45 @@ func (r *DocumentRepository) List() ([]*document.Document, error) {
 	if err := r.db.Find(&models).Error; err != nil {
 		return nil, err
 	}
-	docs := make([]*document.Document, len(models))
+	documents := make([]*document.Document, len(models))
 	for i, m := range models {
-		docs[i] = toDocumentDomain(&m)
+		documents[i] = toDocumentDomain(&m)
 	}
-	return docs, nil
+	return documents, nil
 }
 
 func toDocumentModel(d *document.Document) *DocumentModel {
 	return &DocumentModel{
-		ID:             d.ID,
-		UserID:         d.UserID,
-		ClientID:       d.ClientID,
-		CompanyID:      d.CompanyID,
-		Type:           d.Type,
-		Number:         d.Number,
-		IssuedBy:       d.IssuedBy,
-		URL:            d.StorageReference.URL,
-		IssuedDate:     d.IssuedDate,
-		ExpirationDate: d.ExpirationDate,
+		ID:               d.ID,
+		UserID:           d.UserID,
+		ClientID:         d.ClientID,
+		DealID:           d.DealID,
+		ContractID:       d.ContractID,
+		CompanyID:        d.CompanyID,
+		Type:             d.Type,
+		Number:           d.Number,
+		IssuedBy:         d.IssuedBy,
+		StorageService:   d.StorageReference.ServiceName,
+		StorageURL:       d.StorageReference.URL,
+		IssuedDate:       d.IssuedDate,
+		ExpirationDate:   d.ExpirationDate,
 	}
 }
 
 func toDocumentDomain(m *DocumentModel) *document.Document {
 	return &document.Document{
-		ID:             m.ID,
-		UserID:         m.UserID,
-		ClientID:       m.ClientID,
-		CompanyID:      m.CompanyID,
-		Type:           m.Type,
-		Number:         m.Number,
-		IssuedBy:       m.IssuedBy,
-		StorageReference: shared.StorageReference{URL: m.URL},
-		IssuedDate:     m.IssuedDate,
-		ExpirationDate: m.ExpirationDate,
+		ID:               m.ID,
+		UserID:           m.UserID,
+		ClientID:         m.ClientID,
+		DealID:           m.DealID,
+		ContractID:       m.ContractID,
+		CompanyID:        m.CompanyID,
+		Type:             m.Type,
+		Number:           m.Number,
+		IssuedBy:         m.IssuedBy,
+		StorageReference: shared.StorageReference{ServiceName: m.StorageService, URL: m.StorageURL},
+		IssuedDate:       m.IssuedDate,
+		ExpirationDate:   m.ExpirationDate,
+		CreatedAt:        m.CreatedAt.Unix(),
 	}
 }

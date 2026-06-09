@@ -11,6 +11,7 @@ import (
 	"github.com/Ozenkol/rbk-go-final/internal/application/service"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/analytic"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/client"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/deal"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/communication"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/company"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/contract"
@@ -20,7 +21,7 @@ import (
 	"github.com/Ozenkol/rbk-go-final/internal/domain/meeting"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/note"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/notification"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/offer"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/proposal"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/product"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/setting"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/tag"
@@ -41,8 +42,9 @@ type Container struct {
 
 	muRepos     sync.Mutex
 	clientRepo  client.ClientRepositoryInterface
+	dealRepo    deal.DealRepositoryInterface
 	userRepo    user.UserRepositoryInterface
-	offerRepo   offer.OfferRepositoryInterface
+	proposalRepo   proposal.ProposalRepositoryInterface
 	taskRepo    task.TaskRepositoryInterface
 	productRepo product.ProductRepositoryInterface
 	noteRepo    note.NoteRepositoryInterface
@@ -99,6 +101,16 @@ func (c *Container) ClientRepository() client.ClientRepositoryInterface {
 	return c.clientRepo
 }
 
+func (c *Container) DealRepository() deal.DealRepositoryInterface {
+	c.muRepos.Lock()
+	defer c.muRepos.Unlock()
+	if c.dealRepo == nil {
+		repo, _ := persistence.NewDealRepository(c.DB())
+		c.dealRepo = repo
+	}
+	return c.dealRepo
+}
+
 func (c *Container) UserRepository() user.UserRepositoryInterface {
 	c.muRepos.Lock()
 	defer c.muRepos.Unlock()
@@ -108,14 +120,14 @@ func (c *Container) UserRepository() user.UserRepositoryInterface {
 	return c.userRepo
 }
 
-func (c *Container) OfferRepository() offer.OfferRepositoryInterface {
+func (c *Container) ProposalRepository() proposal.ProposalRepositoryInterface {
 	c.muRepos.Lock()
 	defer c.muRepos.Unlock()
-	if c.offerRepo == nil {
-		repo, _ := persistence.NewOfferRepository(c.DB())
-		c.offerRepo = repo
+	if c.proposalRepo == nil {
+		repo, _ := persistence.NewProposalRepository(c.DB())
+		c.proposalRepo = repo
 	}
-	return c.offerRepo
+	return c.proposalRepo
 }
 
 func (c *Container) TaskRepository() task.TaskRepositoryInterface {
@@ -286,6 +298,10 @@ func (c *Container) App() *application.Application {
 				UpdateClient: command.NewUpdateClientHandler(c.ClientRepository()),
 				DeleteClient: command.NewDeleteClientHandler(c.ClientRepository()),
 
+				CreateDeal: command.NewCreateDealHandler(c.DealRepository()),
+				UpdateDeal: command.NewUpdateDealHandler(c.DealRepository()),
+				DeleteDeal: command.NewDeleteDealHandler(c.DealRepository()),
+
 				CreateTask: command.NewCreateTaskHandler(c.TaskRepository()),
 				UpdateTask: command.NewUpdateTaskHandler(c.TaskRepository()),
 				DeleteTask: command.NewDeleteTaskHandler(c.TaskRepository()),
@@ -294,9 +310,9 @@ func (c *Container) App() *application.Application {
 				UpdateNote: command.NewUpdateNoteHandler(c.NoteRepository()),
 				DeleteNote: command.NewDeleteNoteHandler(c.NoteRepository()),
 
-				CreateOffer: command.NewCreateOfferHandler(c.OfferRepository()),
-				UpdateOffer: command.NewUpdateOfferHandler(c.OfferRepository()),
-				DeleteOffer: command.NewDeleteOfferHandler(c.OfferRepository()),
+				CreateProposal: command.NewCreateProposalHandler(c.ProposalRepository()),
+				UpdateProposal: command.NewUpdateProposalHandler(c.ProposalRepository()),
+				DeleteProposal: command.NewDeleteProposalHandler(c.ProposalRepository()),
 
 				CreateDocument: command.NewCreateDocumentHandler(c.DocumentRepository(), c.StorageProvider()),
 				UpdateDocument: command.NewUpdateDocumentHandler(c.DocumentRepository(), c.StorageProvider()),
@@ -353,14 +369,17 @@ func (c *Container) App() *application.Application {
 				GetClientByID: query.NewFetchClientByIDHandler(c.ClientRepository()),
 				ListClients:   query.NewFetchClientListHandler(c.ClientRepository()),
 
+				GetDealByID: query.NewFetchDealByIDHandler(c.DealRepository()),
+				ListDeals:   query.NewFetchDealListHandler(c.DealRepository()),
+
 				GetTaskByID: query.NewFetchTaskByIDHandler(c.TaskRepository()),
 				ListTasks:   query.NewFetchTaskListHandler(c.TaskRepository()),
 
 				GetNoteByID: query.NewFetchNoteByIDHandler(c.NoteRepository()),
 				ListNotes:   query.NewFetchNoteListHandler(c.NoteRepository()),
 
-				GetOfferByID: query.NewFetchOfferByIDHandler(c.OfferRepository()),
-				ListOffers:   query.NewFetchOfferListHandler(c.OfferRepository()),
+				GetProposalByID: query.NewFetchProposalByIDHandler(c.ProposalRepository()),
+				ListProposals:   query.NewFetchProposalListHandler(c.ProposalRepository()),
 
 				GetDocumentByID: query.NewFetchDocumentByIDHandler(c.DocumentRepository(), c.StorageProvider()),
 				ListDocuments:   query.NewFetchDocumentListHandler(c.DocumentRepository(), c.StorageProvider()),

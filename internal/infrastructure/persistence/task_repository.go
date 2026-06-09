@@ -1,18 +1,26 @@
 package persistence
 
 import (
+	"github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/task"
 	"gorm.io/gorm"
 )
 
 type TaskModel struct {
-	ID          string `gorm:"primaryKey"`
-	UserID      string
-	Title       string
-	Description string
-	StartTime   string
-	EndTime     string
-	IsDone      bool
+	gorm.Model
+	ID            string `gorm:"primaryKey"`
+	UserID        string
+	CompanyID     string
+	ClientID      string
+	DealID        string
+	ContractID    string
+	ResponsibleID string
+	Title         string
+	Description   string
+	Status        string
+	Priority      string
+	Deadline      int64
+	ReminderAt    int64
 }
 
 type TaskRepository struct {
@@ -68,24 +76,38 @@ func (r *TaskRepository) List() ([]*task.Task, error) {
 
 func toTaskModel(t *task.Task) *TaskModel {
 	return &TaskModel{
-		ID:          t.ID,
-		UserID:      t.UserID,
-		Title:       t.Title,
-		Description: t.Description,
-		StartTime:   t.StartTime,
-		EndTime:     t.EndTime,
-		IsDone:      t.IsDone,
+		ID:            t.ID,
+		UserID:        t.UserID,
+		CompanyID:     t.CompanyID,
+		ClientID:      t.ClientID,
+		DealID:        t.DealID,
+		ContractID:    t.ContractID,
+		ResponsibleID: t.ResponsibleID,
+		Title:         t.Title,
+		Description:   t.Description,
+		Status:        string(t.Status),
+		Priority:      string(t.Priority),
+		Deadline:      t.Deadline,
+		ReminderAt:    t.ReminderAt,
 	}
 }
 
 func toTaskDomain(m *TaskModel) *task.Task {
 	return &task.Task{
-		ID:          m.ID,
-		UserID:      m.UserID,
-		Title:       m.Title,
-		Description: m.Description,
-		StartTime:   m.StartTime,
-		EndTime:     m.EndTime,
-		IsDone:      m.IsDone,
+		ID:            m.ID,
+		UserID:        m.UserID,
+		CompanyID:     m.CompanyID,
+		ClientID:      m.ClientID,
+		DealID:        m.DealID,
+		ContractID:    m.ContractID,
+		ResponsibleID: m.ResponsibleID,
+		Title:         m.Title,
+		Description:   m.Description,
+		Status:        shared.TaskStatus(m.Status),
+		Priority:      shared.TaskPriority(m.Priority),
+		Deadline:      m.Deadline,
+		ReminderAt:    m.ReminderAt,
+		CreatedAt:     m.CreatedAt.Unix(),
+		UpdatedAt:     m.UpdatedAt.Unix(),
 	}
 }

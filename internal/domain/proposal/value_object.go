@@ -1,8 +1,8 @@
-package invoice
+package proposal
 
-type InvoiceItem struct {
+type ProposalItem struct {
 	ID          string  `json:"id"`
-	InvoiceID   string  `json:"invoice_id"`
+	ProposalID  string  `json:"proposal_id"`
 	ProductID   string  `json:"product_id"`
 	Description string  `json:"description"`
 	Quantity    int     `json:"quantity"`
