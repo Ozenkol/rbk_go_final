@@ -46,9 +46,10 @@ func registerRoutes(engine *gin.Engine, log *slog.Logger, deps http_deps.Depende
 	authHandler := handlers.NewAuthHandler(&deps, log)
 	documentHandler := handlers.NewDocumentHandler(&deps, log)
 	noteHandler := handlers.NewNoteHandler(&deps, log)
-	offerHandler := handlers.NewOfferHandler(&deps, log)
+	proposalHandler := handlers.NewProposalHandler(&deps, log)
 	taskHandler := handlers.NewTaskHandler(&deps, log)
 	clientHandler := handlers.NewClientHandler(&deps, log)
+	dealHandler := handlers.NewDealHandler(&deps, log)
 	analyticHandler := handlers.NewAnalyticHandler(&deps, log)
 	commHandler := handlers.NewCommunicationHandler(&deps, log)
 	companyHandler := handlers.NewCompanyHandler(&deps, log)
@@ -81,13 +82,13 @@ func registerRoutes(engine *gin.Engine, log *slog.Logger, deps http_deps.Depende
 
 		v1.Use(authMiddleware.MiddlewareFunc())
 
-		// Offers
-		offers := v1.Group("/offers")
+		// Proposals
+		proposals := v1.Group("/proposals")
 		{
-			offers.POST("", offerHandler.CreateOffer)
-			offers.GET("/:id", offerHandler.GetOffer)
-			offers.PUT("/:id", offerHandler.UpdateOffer)
-			offers.DELETE("/:id", offerHandler.DeleteOffer)
+			proposals.POST("", proposalHandler.CreateProposal)
+			proposals.GET("/:id", proposalHandler.GetProposal)
+			proposals.PUT("/:id", proposalHandler.UpdateProposal)
+			proposals.DELETE("/:id", proposalHandler.DeleteProposal)
 		}
 
 		// Notes
@@ -125,6 +126,16 @@ func registerRoutes(engine *gin.Engine, log *slog.Logger, deps http_deps.Depende
 			clients.GET("/:id", clientHandler.GetClient)
 			clients.PUT("/:id", clientHandler.UpdateClient)
 			clients.DELETE("/:id", clientHandler.DeleteClient)
+		}
+
+		// Deals
+		deals := v1.Group("/deals")
+		{
+			deals.POST("", dealHandler.CreateDeal)
+			deals.GET("", dealHandler.ListDeals)
+			deals.GET("/:id", dealHandler.GetDeal)
+			deals.PUT("/:id", dealHandler.UpdateDeal)
+			deals.DELETE("/:id", dealHandler.DeleteDeal)
 		}
 
 		// Analytics

@@ -8,8 +8,10 @@ import (
 	"github.com/Ozenkol/rbk-go-final/internal/application/query"
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
 	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/task"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type TaskHandler struct {
@@ -21,19 +23,13 @@ func NewTaskHandler(deps *http_deps.Dependencies, logs *slog.Logger) *TaskHandle
 	return &TaskHandler{deps: deps, logs: logs}
 }
 
-// swagger:route POST /api/v1/tasks tasks createTask
-// Создать новую задачу.
-// Security:
-//   Bearer:
-// responses:
-//   201: createTaskResponse
-//   400: errorResponse
 func (h *TaskHandler) CreateTask(c *gin.Context) {
 	var req http_requests.CreateTaskRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
 	token := c.GetHeader("Authorization")
 	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
 	if err != nil {
@@ -42,17 +38,21 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 	}
 
 	t := &task.Task{
-		UserID:      userID,
-		CompanyID:   companyID,
-		Title:       req.Title,
-		Description: req.Description,
-		StartTime:   req.StartTime,
-		EndTime:     req.EndTime,
+		ID:            uuid.New().String(),
+		UserID:        userID,
+		CompanyID:     companyID,
+		ClientID:      req.ClientID,
+		DealID:        req.DealID,
+		ContractID:    req.ContractID,
+		ResponsibleID: req.ResponsibleID,
+		Title:         req.Title,
+		Description:   req.Description,
+		Status:        shared.TaskStatusNew,
+		Priority:      shared.TaskPriorityMedium,
+		Deadline:      req.Deadline,
 	}
 
-	res, err := h.deps.App.Commands.CreateTask.Handle(c.Request.Context(), command.CreateTaskCommand{
-		Task: t,
-	})
+	res, err := h.deps.App.Commands.CreateTask.Handle(c.Request.Context(), command.CreateTaskCommand{Task: t})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -60,13 +60,6 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 	c.JSON(http.StatusCreated, res)
 }
 
-// swagger:route GET /api/v1/tasks/{id} tasks getTask
-// Получить задачу по ID.
-// security:
-//   Bearer:
-// responses:
-//   200: getTaskResponse
-//   500: errorResponse
 func (h *TaskHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.deps.App.Queries.GetTaskByID.Handle(c.Request.Context(), query.FetchTaskByID{ID: id})
@@ -77,13 +70,6 @@ func (h *TaskHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// swagger:route PUT /api/v1/tasks/{id} tasks updateTask
-// Обновить задачу.
-// security:
-//   Bearer:
-// responses:
-//   200: getTaskResponse
-//   500: errorResponse
 func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	id := c.Param("id")
 	var req http_requests.UpdateTaskRequest
@@ -91,37 +77,20 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token := c.GetHeader("Authorization")
-	userID, companyID, err := h.deps.App.Services.AuthService.GetAuthInfoFromToken(token)
+
+	t, err := h.deps.App.Queries.GetTaskByID.Handle(c.Request.Context(), query.FetchTaskByID{ID: id})
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
 		return
 	}
 
-	t := &task.Task{
-		ID:        id,
-		UserID:    userID,
-		CompanyID: companyID,
-	}
-	if req.Title != nil {
-		t.Title = *req.Title
-	}
-	if req.Description != nil {
-		t.Description = *req.Description
-	}
-	if req.StartTime != nil {
-		t.StartTime = *req.StartTime
-	}
-	if req.EndTime != nil {
-		t.EndTime = *req.EndTime
-	}
-	if req.IsDone != nil {
-		t.IsDone = *req.IsDone
-	}
+	if req.Title != "" { t.Title = req.Title }
+	if req.Description != "" { t.Description = req.Description }
+	if req.Status != "" { t.Status = shared.TaskStatus(req.Status) }
+	if req.Priority != "" { t.Priority = shared.TaskPriority(req.Priority) }
+	if req.Deadline != 0 { t.Deadline = req.Deadline }
 
-	res, err := h.deps.App.Commands.UpdateTask.Handle(c.Request.Context(), command.UpdateTaskCommand{
-		Task: t,
-	})
+	res, err := h.deps.App.Commands.UpdateTask.Handle(c.Request.Context(), command.UpdateTaskCommand{Task: t})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -129,13 +98,6 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
-// swagger:route DELETE /api/v1/tasks/{id} tasks deleteTask
-// Удалить задачу.
-// security:
-//   Bearer:
-// responses:
-//   200: deleteTaskResponse
-//   500: errorResponse
 func (h *TaskHandler) DeleteTask(c *gin.Context) {
 	id := c.Param("id")
 	err := h.deps.App.Commands.DeleteTask.Handle(c.Request.Context(), command.DeleteTaskCommand{ID: id})
@@ -143,5 +105,5 @@ func (h *TaskHandler) DeleteTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusNoContent, nil)
+	c.Status(http.StatusNoContent)
 }

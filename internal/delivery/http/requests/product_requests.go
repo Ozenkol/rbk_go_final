@@ -1,33 +1,20 @@
 package http_requests
 
-import "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
-
-// CreateProductRequest represents the request body for creating a product
-// swagger:model CreateProductRequest
 type CreateProductRequest struct {
-	// Product name
-	// example: Premium Subscription
-	Name        string                  `json:"name"`
-	// Product description
-	// example: Access to all premium features
-	Description string                  `json:"description"`
-	// Thumbnail storage reference
-	Thumbnail   shared.StorageReference `json:"thumbnail"`
-	// Product price
-	Price       shared.Money            `json:"price"`
+	Name        string  `json:"name" binding:"required"`
+	Description string  `json:"description"`
+	Type        string  `json:"type"`
+	Category    string  `json:"category"`
+	SKU         string  `json:"sku"`
+	Price       float64 `json:"price"`
+	Currency    string  `json:"currency"`
+	Unit        string  `json:"unit"`
+	IsActive    bool    `json:"is_active"`
 }
 
-// UpdateProductRequest represents the request body for updating a product
-// swagger:model UpdateProductRequest
 type UpdateProductRequest struct {
-	// Product name
-	// example: Premium Subscription
-	Name        string                  `json:"name"`
-	// Product description
-	// example: Access to all premium features
-	Description string                  `json:"description"`
-	// Thumbnail storage reference
-	Thumbnail   shared.StorageReference `json:"thumbnail"`
-	// Product price
-	Price       shared.Money            `json:"price"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	IsActive    bool    `json:"is_active"`
 }

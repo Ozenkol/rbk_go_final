@@ -2,14 +2,22 @@ package persistence
 
 import (
 	"github.com/Ozenkol/rbk-go-final/internal/domain/contract"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 	"gorm.io/gorm"
 )
 
 type ContractModel struct {
-	ID        string `gorm:"primaryKey"`
-	ClientID  string
-	CompanyID string
-	Content   string
+	gorm.Model
+	ID         string `gorm:"primaryKey"`
+	UserID     string
+	ClientID   string
+	DealID     string
+	CompanyID  string
+	Number     string
+	Status     string
+	ValidFrom  int64
+	ValidUntil int64
+	FileID     string
 }
 
 type ContractRepository struct {
@@ -65,18 +73,32 @@ func (r *ContractRepository) List() ([]*contract.Contract, error) {
 
 func toContractModel(c *contract.Contract) *ContractModel {
 	return &ContractModel{
-		ID:        c.ID,
-		ClientID:  c.ClientID,
-		CompanyID: c.CompanyID,
-		Content:   c.Content,
+		ID:         c.ID,
+		UserID:     c.UserID,
+		ClientID:   c.ClientID,
+		DealID:     c.DealID,
+		CompanyID:  c.CompanyID,
+		Number:     c.Number,
+		Status:     string(c.Status),
+		ValidFrom:  c.ValidFrom,
+		ValidUntil: c.ValidUntil,
+		FileID:     c.FileID,
 	}
 }
 
 func toContractDomain(m *ContractModel) *contract.Contract {
 	return &contract.Contract{
-		ID:        m.ID,
-		ClientID:  m.ClientID,
-		CompanyID: m.CompanyID,
-		Content:   m.Content,
+		ID:         m.ID,
+		UserID:     m.UserID,
+		ClientID:   m.ClientID,
+		DealID:     m.DealID,
+		CompanyID:  m.CompanyID,
+		Number:     m.Number,
+		Status:     shared.ContractStatus(m.Status),
+		ValidFrom:  m.ValidFrom,
+		ValidUntil: m.ValidUntil,
+		FileID:     m.FileID,
+		CreatedAt:  m.CreatedAt.Unix(),
+		UpdatedAt:  m.UpdatedAt.Unix(),
 	}
 }

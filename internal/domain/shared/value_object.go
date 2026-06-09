@@ -122,3 +122,96 @@ func (*Person) NewPerson(name HumanName, birthDate BirthDate, address Address, p
 		Phone:     phone,
 	}
 }
+
+type ClientType string
+
+const (
+	ClientTypePerson  ClientType = "PERSON"
+	ClientTypeCompany ClientType = "COMPANY"
+)
+
+type DealStage string
+
+const (
+	DealStageNew           DealStage = "NEW"
+	DealStageContacted     DealStage = "CONTACTED"
+	DealStageNeedsAnalysis DealStage = "NEEDS_ANALYSIS"
+	DealStageProposalSent  DealStage = "PROPOSAL_SENT"
+	DealStageNegotiation   DealStage = "NEGOTIATION"
+	DealStageContract      DealStage = "CONTRACT"
+	DealStageWon           DealStage = "WON"
+	DealStageLost          DealStage = "LOST"
+)
+
+type TaskStatus string
+
+const (
+	TaskStatusNew        TaskStatus = "NEW"
+	TaskStatusInProgress TaskStatus = "IN_PROGRESS"
+	TaskStatusDone       TaskStatus = "DONE"
+	TaskStatusCancelled  TaskStatus = "CANCELLED"
+	TaskStatusOverdue    TaskStatus = "OVERDUE"
+)
+
+type TaskPriority string
+
+const (
+	TaskPriorityLow    TaskPriority = "LOW"
+	TaskPriorityMedium TaskPriority = "MEDIUM"
+	TaskPriorityHigh   TaskPriority = "HIGH"
+)
+
+type CommunicationType string
+
+const (
+	CommTypeCall     CommunicationType = "CALL"
+	CommTypeEmail    CommunicationType = "EMAIL"
+	CommTypeWhatsApp CommunicationType = "WHATSAPP"
+	CommTypeMeeting  CommunicationType = "MEETING"
+	CommTypeSMS      CommunicationType = "SMS"
+	CommTypeOther    CommunicationType = "OTHER"
+)
+
+type ProposalStatus string
+
+const (
+	ProposalStatusDraft    ProposalStatus = "DRAFT"
+	ProposalStatusSent     ProposalStatus = "SENT"
+	ProposalStatusViewed   ProposalStatus = "VIEWED"
+	ProposalStatusAccepted ProposalStatus = "ACCEPTED"
+	ProposalStatusRejected ProposalStatus = "REJECTED"
+	ProposalStatusExpired  ProposalStatus = "EXPIRED"
+)
+
+type InvoiceStatus string
+
+const (
+	InvoiceStatusDraft         InvoiceStatus = "DRAFT"
+	InvoiceStatusSent          InvoiceStatus = "SENT"
+	InvoiceStatusPaid          InvoiceStatus = "PAID"
+	InvoiceStatusPartiallyPaid InvoiceStatus = "PARTIALLY_PAID"
+	InvoiceStatusOverdue       InvoiceStatus = "OVERDUE"
+	InvoiceStatusCancelled     InvoiceStatus = "CANCELLED"
+)
+
+type ContractStatus string
+
+const (
+	ContractStatusDraft      ContractStatus = "DRAFT"
+	ContractStatusOnApproval ContractStatus = "ON_APPROVAL"
+	ContractStatusSigned     ContractStatus = "SIGNED"
+	ContractStatusActive     ContractStatus = "ACTIVE"
+	ContractStatusExpired    ContractStatus = "EXPIRED"
+	ContractStatusTerminated ContractStatus = "TERMINATED"
+)
+
+type UserRole string
+
+const (
+	RoleAdmin        UserRole = "ADMIN"
+	RoleSalesLead    UserRole = "SALES_LEAD"
+	RoleSalesManager UserRole = "SALES_MANAGER"
+	RoleAccountant   UserRole = "ACCOUNTANT"
+	RoleSupport      UserRole = "SUPPORT"
+	RoleViewer       UserRole = "VIEWER"
+)

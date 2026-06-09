@@ -2,22 +2,35 @@ package http_requests
 
 import "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 
-// CreateClientRequest represents the request body for creating a client
-// swagger:model CreateClientRequest
 type CreateClientRequest struct {
-	// Client personal information
-	Person    shared.Person `json:"person"`
-	// Client active status
-	// example: true
-	IsActive  bool          `json:"is_active"`
+	Type              string        `json:"type" binding:"required"`
+	Name              string        `json:"name" binding:"required"`
+	Email             string        `json:"email"`
+	Phone             string        `json:"phone"`
+	WhatsApp          string        `json:"whatsapp"`
+	IdentificationNum string        `json:"identification_num"`
+	Address           string        `json:"address"`
+	Source            string        `json:"source"`
+	Status            string        `json:"status"`
+	ResponsibleID     string        `json:"responsible_id"`
+	Tags              []string      `json:"tags"`
+	Person            shared.Person `json:"person"`
+	IsActive          bool          `json:"is_active"`
+	Comment           string        `json:"comment"`
 }
 
-// UpdateClientRequest represents the request body for updating a client
-// swagger:model UpdateClientRequest
 type UpdateClientRequest struct {
-	// Client personal information
-	Person    shared.Person `json:"person"`
-	// Client active status
-	// example: true
-	IsActive  bool          `json:"is_active"`
+	Name              string        `json:"name"`
+	Email             string        `json:"email"`
+	Phone             string        `json:"phone"`
+	WhatsApp          string        `json:"whatsapp"`
+	IdentificationNum string        `json:"identification_num"`
+	Address           string        `json:"address"`
+	Source            string        `json:"source"`
+	Status            string        `json:"status"`
+	ResponsibleID     string        `json:"responsible_id"`
+	Tags              []string      `json:"tags"`
+	Person            shared.Person `json:"person"`
+	IsActive          bool          `json:"is_active"`
+	Comment           string        `json:"comment"`
 }

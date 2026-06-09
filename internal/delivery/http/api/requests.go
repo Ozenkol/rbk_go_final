@@ -211,15 +211,15 @@ type notificationIDParams struct {
 	ID string `json:"id"`
 }
 
-// swagger:parameters createOffer
-type createOfferParams struct {
+// swagger:parameters createProposal
+type createProposalParams struct {
 	// in: body
 	// required: true
-	Body http_requests.CreateOfferRequest
+	Body http_requests.CreateProposalRequest
 }
 
-// swagger:parameters getOffer updateOffer deleteOffer
-type offerIDParams struct {
+// swagger:parameters getProposal updateProposal deleteProposal
+type proposalIDParams struct {
 	// in: path
 	// required: true
 	ID string `json:"id"`

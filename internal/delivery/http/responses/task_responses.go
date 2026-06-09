@@ -13,7 +13,7 @@ import (
 	"github.com/Ozenkol/rbk-go-final/internal/domain/invoice"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/meeting"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/notification"
-	"github.com/Ozenkol/rbk-go-final/internal/domain/offer"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/proposal"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/product"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/setting"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/tag"
@@ -161,10 +161,10 @@ type listNotificationsResponse struct {
 	Body []notification.Notification
 }
 
-// swagger:response getOfferResponse
-type getOfferResponse struct {
+// swagger:response getProposalResponse
+type getProposalResponse struct {
 	// in: body
-	Body offer.Offer
+	Body proposal.Proposal
 }
 
 // swagger:response getProductResponse

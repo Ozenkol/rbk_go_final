@@ -9,6 +9,7 @@ import (
 	http_deps "github.com/Ozenkol/rbk-go-final/internal/delivery/http/deps"
 	http_requests "github.com/Ozenkol/rbk-go-final/internal/delivery/http/requests"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/client"
+	"github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,10 +44,22 @@ func (h *ClientHandler) CreateClient(c *gin.Context) {
 	}
 
 	cl := &client.Client{
-		UserID:    userID,
-		CompanyID: companyID,
-		Person:    req.Person,
-		IsActive:  req.IsActive,
+		UserID:            userID,
+		CompanyID:         companyID,
+		Type:              shared.ClientType(req.Type),
+		Name:              req.Name,
+		Email:             req.Email,
+		Phone:             req.Phone,
+		WhatsApp:          req.WhatsApp,
+		IdentificationNum: req.IdentificationNum,
+		Address:           req.Address,
+		Source:            req.Source,
+		Status:            req.Status,
+		ResponsibleID:     req.ResponsibleID,
+		Tags:              req.Tags,
+		Person:            req.Person,
+		IsActive:          req.IsActive,
+		Comment:           req.Comment,
 	}
 
 	res, err := h.deps.App.Commands.CreateClient.Handle(c.Request.Context(), command.CreateClientCommand{
@@ -115,11 +128,22 @@ func (h *ClientHandler) UpdateClient(c *gin.Context) {
 	}
 
 	cl := &client.Client{
-		ID:        id,
-		UserID:    userID,
-		CompanyID: companyID,
-		Person:    req.Person,
-		IsActive:  req.IsActive,
+		ID:                id,
+		UserID:            userID,
+		CompanyID:         companyID,
+		Name:              req.Name,
+		Email:             req.Email,
+		Phone:             req.Phone,
+		WhatsApp:          req.WhatsApp,
+		IdentificationNum: req.IdentificationNum,
+		Address:           req.Address,
+		Source:            req.Source,
+		Status:            req.Status,
+		ResponsibleID:     req.ResponsibleID,
+		Tags:              req.Tags,
+		Person:            req.Person,
+		IsActive:          req.IsActive,
+		Comment:           req.Comment,
 	}
 
 	res, err := h.deps.App.Commands.UpdateClient.Handle(c.Request.Context(), command.UpdateClientCommand{
