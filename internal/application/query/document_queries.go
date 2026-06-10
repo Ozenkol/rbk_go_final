@@ -3,16 +3,12 @@ package query
 import (
 	"context"
 	"github.com/Ozenkol/rbk-go-final/internal/application/adapters"
+	application_shared "github.com/Ozenkol/rbk-go-final/internal/application/shared"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/document"
 )
 
 type FetchDocumentByID struct {
 	ID string
-}
-
-type FetchDocumentByIDResult struct {
-	Document    *document.Document `json:"document"`
-	DownloadURL string             `json:"download_url"`
 }
 
 type FetchDocumentByIDHandler struct {
@@ -30,8 +26,13 @@ func NewFetchDocumentByIDHandler(
 	}
 }
 
-func (h *FetchDocumentByIDHandler) Handle(ctx context.Context, q FetchDocumentByID) (*FetchDocumentByIDResult, error) {
+func (h *FetchDocumentByIDHandler) Handle(ctx context.Context, q FetchDocumentByID) (*application_shared.DocumentResponse, error) {
 	doc, err := h.repo.GetByID(q.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	uploadURL, err := h.storageProvider.CreateUploadURL(ctx, doc.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -41,18 +42,20 @@ func (h *FetchDocumentByIDHandler) Handle(ctx context.Context, q FetchDocumentBy
 		return nil, err
 	}
 
-	return &FetchDocumentByIDResult{
+	updateURL, err := h.storageProvider.CreateUpdateURL(ctx, doc.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &application_shared.DocumentResponse{
 		Document:    doc,
+		UploadURL:   uploadURL,
 		DownloadURL: downloadURL,
+		UpdateURL:   updateURL,
 	}, nil
 }
 
 type FetchDocumentList struct{}
-
-type DocumentWithURL struct {
-	*document.Document
-	DownloadURL string `json:"download_url"`
-}
 
 type FetchDocumentListHandler struct {
 	repo            document.DocumentRepositoryInterface
@@ -69,18 +72,23 @@ func NewFetchDocumentListHandler(
 	}
 }
 
-func (h *FetchDocumentListHandler) Handle(ctx context.Context, q FetchDocumentList) ([]DocumentWithURL, error) {
+func (h *FetchDocumentListHandler) Handle(ctx context.Context, q FetchDocumentList) ([]application_shared.DocumentResponse, error) {
 	docs, err := h.repo.List()
 	if err != nil {
 		return nil, err
 	}
 
-	var results []DocumentWithURL
+	var results []application_shared.DocumentResponse
 	for _, doc := range docs {
+		uploadURL, _ := h.storageProvider.CreateUploadURL(ctx, doc.ID)
 		downloadURL, _ := h.storageProvider.CreateDownloadURL(ctx, doc.ID)
-		results = append(results, DocumentWithURL{
+		updateURL, _ := h.storageProvider.CreateUpdateURL(ctx, doc.ID)
+
+		results = append(results, application_shared.DocumentResponse{
 			Document:    doc,
+			UploadURL:   uploadURL,
 			DownloadURL: downloadURL,
+			UpdateURL:   updateURL,
 		})
 	}
 

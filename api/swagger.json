@@ -952,11 +952,11 @@
         "operationId": "listDocuments",
         "responses": {
           "200": {
-            "description": "DocumentWithURL",
+            "description": "DocumentResponse",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/DocumentWithURL"
+                "$ref": "#/definitions/DocumentResponse"
               }
             }
           }
@@ -985,9 +985,9 @@
         ],
         "responses": {
           "201": {
-            "description": "Document",
+            "description": "DocumentResponse",
             "schema": {
-              "$ref": "#/definitions/Document"
+              "$ref": "#/definitions/DocumentResponse"
             }
           },
           "400": {
@@ -1022,9 +1022,9 @@
         ],
         "responses": {
           "200": {
-            "description": "Document",
+            "description": "DocumentResponse",
             "schema": {
-              "$ref": "#/definitions/Document"
+              "$ref": "#/definitions/DocumentResponse"
             }
           },
           "404": {
@@ -1057,9 +1057,9 @@
         ],
         "responses": {
           "200": {
-            "description": "Document",
+            "description": "DocumentResponse",
             "schema": {
-              "$ref": "#/definitions/Document"
+              "$ref": "#/definitions/DocumentResponse"
             }
           },
           "400": {
@@ -3363,9 +3363,6 @@
           "type": "string",
           "x-go-name": "Number"
         },
-        "storage_reference": {
-          "$ref": "#/definitions/StorageReference"
-        },
         "type": {
           "type": "string",
           "x-go-name": "Type"
@@ -3376,6 +3373,75 @@
         }
       },
       "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/domain/document"
+    },
+    "DocumentResponse": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "x-go-name": "ClientID"
+        },
+        "company_id": {
+          "type": "string",
+          "x-go-name": "CompanyID"
+        },
+        "contract_id": {
+          "type": "string",
+          "x-go-name": "ContractID"
+        },
+        "created_at": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "CreatedAt"
+        },
+        "deal_id": {
+          "type": "string",
+          "x-go-name": "DealID"
+        },
+        "download_url": {
+          "type": "string",
+          "x-go-name": "DownloadURL"
+        },
+        "expiration_date": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ExpirationDate"
+        },
+        "id": {
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "issued_by": {
+          "type": "string",
+          "x-go-name": "IssuedBy"
+        },
+        "issued_date": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "IssuedDate"
+        },
+        "number": {
+          "type": "string",
+          "x-go-name": "Number"
+        },
+        "type": {
+          "type": "string",
+          "x-go-name": "Type"
+        },
+        "update_url": {
+          "type": "string",
+          "x-go-name": "UpdateURL"
+        },
+        "upload_url": {
+          "type": "string",
+          "x-go-name": "UploadURL"
+        },
+        "user_id": {
+          "type": "string",
+          "x-go-name": "UserID"
+        }
+      },
+      "x-go-package": "github.com/Ozenkol/rbk-go-final/internal/application/shared"
     },
     "File": {
       "type": "object",

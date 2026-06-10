@@ -2,6 +2,7 @@ package document
 
 import "github.com/Ozenkol/rbk-go-final/internal/domain/shared"
 
+// swagger:model Document
 type Document struct {
 	ID               string                  `json:"id"`
 	UserID           string                  `json:"user_id"`
@@ -12,7 +13,7 @@ type Document struct {
 	Type             string                  `json:"type"` // Identity, Registration, etc.
 	Number           string                  `json:"number"`
 	IssuedBy         string                  `json:"issued_by"`
-	StorageReference shared.StorageReference `json:"storage_reference"`
+	StorageReference shared.StorageReference `json:"-"`
 	IssuedDate       int64                   `json:"issued_date"`
 	ExpirationDate   int64                   `json:"expiration_date"`
 	CreatedAt        int64                   `json:"created_at"`
