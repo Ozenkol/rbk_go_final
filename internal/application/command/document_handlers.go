@@ -3,16 +3,12 @@ package command
 import (
 	"context"
 	"github.com/Ozenkol/rbk-go-final/internal/application/adapters"
+	application_shared "github.com/Ozenkol/rbk-go-final/internal/application/shared"
 	"github.com/Ozenkol/rbk-go-final/internal/domain/document"
 )
 
 type CreateDocumentCommand struct {
 	Document *document.Document
-}
-
-type CreateDocumentResult struct {
-	Document  *document.Document `json:"document"`
-	UploadURL string             `json:"upload_url"`
 }
 
 type CreateDocumentHandler struct {
@@ -30,7 +26,7 @@ func NewCreateDocumentHandler(
 	}
 }
 
-func (h *CreateDocumentHandler) Handle(ctx context.Context, cmd CreateDocumentCommand) (*CreateDocumentResult, error) {
+func (h *CreateDocumentHandler) Handle(ctx context.Context, cmd CreateDocumentCommand) (*application_shared.DocumentResponse, error) {
 	doc, err := h.repo.Create(cmd.Document)
 	if err != nil {
 		return nil, err
@@ -42,17 +38,20 @@ func (h *CreateDocumentHandler) Handle(ctx context.Context, cmd CreateDocumentCo
 	}
 
 	downloadURL, err := h.storageProvider.CreateDownloadURL(ctx, doc.ID)
-	if err == nil {
-		doc.StorageReference.URL = downloadURL
-		doc, err = h.repo.Update(doc)
-		if err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
 
-	return &CreateDocumentResult{
-		Document:  doc,
-		UploadURL: uploadURL,
+	updateURL, err := h.storageProvider.CreateUpdateURL(ctx, doc.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &application_shared.DocumentResponse{
+		Document:    doc,
+		UploadURL:   uploadURL,
+		DownloadURL: downloadURL,
+		UpdateURL:   updateURL,
 	}, nil
 }
 
@@ -60,10 +59,6 @@ type UpdateDocumentCommand struct {
 	Document *document.Document
 }
 
-type UpdateDocumentResult struct {
-	Document  *document.Document `json:"document"`
-	UpdateURL string             `json:"update_url"`
-}
 
 type UpdateDocumentHandler struct {
 	repo            document.DocumentRepositoryInterface
@@ -80,8 +75,18 @@ func NewUpdateDocumentHandler(
 	}
 }
 
-func (h *UpdateDocumentHandler) Handle(ctx context.Context, cmd UpdateDocumentCommand) (*UpdateDocumentResult, error) {
+func (h *UpdateDocumentHandler) Handle(ctx context.Context, cmd UpdateDocumentCommand) (*application_shared.DocumentResponse, error) {
 	doc, err := h.repo.Update(cmd.Document)
+	if err != nil {
+		return nil, err
+	}
+
+	uploadURL, err := h.storageProvider.CreateUploadURL(ctx, doc.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	downloadURL, err := h.storageProvider.CreateDownloadURL(ctx, doc.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -91,9 +96,11 @@ func (h *UpdateDocumentHandler) Handle(ctx context.Context, cmd UpdateDocumentCo
 		return nil, err
 	}
 
-	return &UpdateDocumentResult{
-		Document:  doc,
-		UpdateURL: updateURL,
+	return &application_shared.DocumentResponse{
+		Document:    doc,
+		UploadURL:   uploadURL,
+		DownloadURL: downloadURL,
+		UpdateURL:   updateURL,
 	}, nil
 }
 

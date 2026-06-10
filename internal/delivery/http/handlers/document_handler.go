@@ -27,7 +27,7 @@ func NewDocumentHandler(deps *http_deps.Dependencies, logs *slog.Logger) *Docume
 // Security:
 //   Bearer:
 // responses:
-//   201: body:Document
+//   201: body:DocumentResponse
 //   400: body:errorResponse
 func (h *DocumentHandler) CreateDocument(c *gin.Context) {
 	var req http_requests.CreateDocumentRequest
@@ -70,7 +70,7 @@ func (h *DocumentHandler) CreateDocument(c *gin.Context) {
 // Security:
 //   Bearer:
 // responses:
-//   200: body:Document
+//   200: body:DocumentResponse
 //   404: body:errorResponse
 func (h *DocumentHandler) GetDocument(c *gin.Context) {
 	id := c.Param("id")
@@ -87,7 +87,7 @@ func (h *DocumentHandler) GetDocument(c *gin.Context) {
 // Security:
 //   Bearer:
 // responses:
-//   200: body:[]DocumentWithURL
+//   200: body:[]DocumentResponse
 func (h *DocumentHandler) ListDocuments(c *gin.Context) {
 	res, err := h.deps.App.Queries.ListDocuments.Handle(c.Request.Context(), query.FetchDocumentList{})
 	if err != nil {
@@ -102,7 +102,7 @@ func (h *DocumentHandler) ListDocuments(c *gin.Context) {
 // Security:
 //   Bearer:
 // responses:
-//   200: body:Document
+//   200: body:DocumentResponse
 //   400: body:errorResponse
 //   404: body:errorResponse
 func (h *DocumentHandler) UpdateDocument(c *gin.Context) {
